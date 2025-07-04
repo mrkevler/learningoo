@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  app:
+    container_name: learningoo-dev
+    build: .
+    ports:
+      - "4000:4000" # backend
+      - "5173:5173" # frontend
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.dev
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo:7
+    container_name: learningoo-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+volumes:
+  mongo-data:
