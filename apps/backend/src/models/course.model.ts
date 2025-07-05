@@ -5,6 +5,7 @@ export interface ICourse extends Document {
   slug: string;
   description?: string;
   categoryId: Types.ObjectId;
+  coverImage: string;
   price: number;
   tutorId: Types.ObjectId;
   isPublished: boolean;
@@ -23,6 +24,7 @@ const courseSchema = new Schema<ICourse>(
       ref: "Category",
       required: true,
     },
+    coverImage: { type: String },
     price: { type: Number, default: 0 },
     tutorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     isPublished: { type: Boolean, default: false },

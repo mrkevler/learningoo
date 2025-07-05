@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { CourseModel } from "../models/course.model";
 
 export const getCourses = asyncHandler(async (_req: Request, res: Response) => {
-  const courses = await CourseModel.find();
+  const courses = await CourseModel.find().populate("categoryId", "name slug");
   res.json(courses);
 });
 

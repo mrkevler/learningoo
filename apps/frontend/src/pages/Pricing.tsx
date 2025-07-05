@@ -65,7 +65,7 @@ const PricingPage = () => {
                 const res = await dispatch(assignLicenseThunk(lic.slug));
                 if (assignLicenseThunk.fulfilled.match(res)) {
                   alert("Plan updated!");
-                  navigate("/profile");
+                  navigate("/my-courses");
                 }
               }}
               className={`w-full py-2 rounded ${user?.licenseId === lic._id ? "bg-gray-600" : "bg-brand hover:bg-brand-dark"}`}
