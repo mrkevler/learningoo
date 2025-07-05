@@ -11,6 +11,7 @@ import ProfilePage from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PricingPage from "./pages/Pricing";
 import TutorialsPage from "./pages/Tutorials";
+import MyCoursesPage from "./pages/MyCourses";
 
 const App = () => {
   const theme = useAppSelector((s) => s.ui.theme);
@@ -31,6 +32,7 @@ const App = () => {
         <Route path="/pricing" element={<PricingPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/my-courses" element={<MyCoursesPage />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

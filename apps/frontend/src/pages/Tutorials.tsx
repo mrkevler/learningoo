@@ -16,7 +16,11 @@ const TutorialsPage = () => {
   const grouped: Record<string, any[]> = {};
   if (courses) {
     courses.forEach((course: any) => {
-      const cat = course.category?.name || course.category || "Uncategorized";
+      const cat =
+        course.categoryId?.name ||
+        course.category?.name ||
+        course.category ||
+        "Uncategorized";
       if (!grouped[cat]) grouped[cat] = [];
       grouped[cat].push(course);
     });

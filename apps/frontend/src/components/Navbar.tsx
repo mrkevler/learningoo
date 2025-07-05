@@ -95,6 +95,18 @@ const Navbar = () => {
               </Link>
             </li>
           )}
+          {user?.role === "tutor" && (
+            <li>
+              <NavLink
+                to="/my-courses"
+                className={({ isActive }) =>
+                  `hover:text-accent ${isActive ? "text-accent" : ""}`
+                }
+              >
+                My Courses
+              </NavLink>
+            </li>
+          )}
           <li>
             <button
               onClick={() => dispatch(toggleTheme())}
