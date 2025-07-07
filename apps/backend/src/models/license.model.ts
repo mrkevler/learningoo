@@ -18,7 +18,5 @@ const licenseSchema = new Schema<ILicense>({
   lessonLimit: { type: Number, default: null },
 });
 
-licenseSchema.index({ slug: 1 });
-
 export const LicenseModel =
   mongoose.models.License || mongoose.model<ILicense>("License", licenseSchema);

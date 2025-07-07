@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PricingPage from "./pages/Pricing";
 import TutorialsPage from "./pages/Tutorials";
 import MyCoursesPage from "./pages/MyCourses";
+import PrivacyPage from "./pages/Privacy";
 
 const App = () => {
   const theme = useAppSelector((s) => s.ui.theme);
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
         <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-courses" element={<MyCoursesPage />} />

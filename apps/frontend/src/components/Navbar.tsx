@@ -39,7 +39,7 @@ const Navbar = () => {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `hover:text-accent ${isActive ? "text-accent" : ""}`
+                `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
               }
             >
               Home
@@ -49,7 +49,7 @@ const Navbar = () => {
             <NavLink
               to="/tutorials"
               className={({ isActive }) =>
-                `hover:text-accent ${isActive ? "text-accent" : ""}`
+                `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
               }
             >
               Tutorials
@@ -59,7 +59,7 @@ const Navbar = () => {
             <NavLink
               to="/pricing"
               className={({ isActive }) =>
-                `hover:text-accent ${isActive ? "text-accent" : ""}`
+                `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
               }
             >
               Pricing
@@ -69,7 +69,7 @@ const Navbar = () => {
             <NavLink
               to="/login"
               className={({ isActive }) =>
-                `hover:text-accent ${isActive ? "text-accent" : ""}`
+                `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
               }
             >
               Login
@@ -89,7 +89,7 @@ const Navbar = () => {
             <li>
               <Link
                 to="/profile"
-                className="flex items-center justify-center h-9 w-9 rounded-full bg-accent text-black font-bold hover:opacity-90"
+                className="flex items-center justify-center h-9 w-9 rounded-full bg-accent-pink text-white font-bold hover:opacity-90"
               >
                 {user.name.charAt(0).toUpperCase()}
               </Link>
@@ -100,7 +100,7 @@ const Navbar = () => {
               <NavLink
                 to="/my-courses"
                 className={({ isActive }) =>
-                  `hover:text-accent ${isActive ? "text-accent" : ""}`
+                  `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
                 }
               >
                 My Courses
@@ -110,7 +110,7 @@ const Navbar = () => {
           <li>
             <button
               onClick={() => dispatch(toggleTheme())}
-              className="text-white hover:text-brand"
+              className="text-white hover:text-accent-purple"
             >
               {theme === "light" ? (
                 <MoonIcon className="h-6 w-6" />
