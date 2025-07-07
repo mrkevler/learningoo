@@ -63,7 +63,7 @@ const TutorialsPage = () => {
                   {courses.map((c: any) => (
                     <div
                       key={c._id}
-                      className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow flex flex-col justify-between"
+                      className="course-card hover-lift flex flex-col justify-between"
                     >
                       <div>
                         <h3 className="text-xl font-semibold mb-2 text-brand-dark dark:text-brand">
@@ -75,7 +75,7 @@ const TutorialsPage = () => {
                       </div>
                       <a
                         href={`/courses/${c.slug}`}
-                        className="mt-4 inline-block text-accent hover:underline"
+                        className="mt-4 inline-block btn-ghost text-brand-dark hover-scale"
                       >
                         View Course →
                       </a>

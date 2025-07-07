@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
+@tailwind utilities;
+
+/* Custom component classes */
+
+.btn-primary {
+  @apply bg-brand hover:bg-brand-dark text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5;
+}
+
+.btn-ghost {
+  @apply text-brand hover:bg-brand/10 px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.hover-lift {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+}
+
+.hover-scale {
+  @apply transition-transform duration-200 hover:scale-105;
+}
+
+/* Course card utility */
+.course-card {
+  @apply bg-white dark:bg-gray-800 rounded-2xl p-6 space-y-4 shadow-sm border border-gray-200 dark:border-gray-700;
+}
+
+.stats-grid {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-6;
+}
+
+.stat-item {
+  @apply text-center space-y-1;
+}
+
+.stat-value {
+  @apply text-2xl sm:text-3xl font-bold text-brand;
+}
+
+.stat-label {
+  @apply text-sm text-gray-600 dark:text-gray-400;
+}

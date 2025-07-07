@@ -13,8 +13,6 @@ const categorySchema = new Schema<ICategory>(
   { timestamps: true }
 );
 
-categorySchema.index({ slug: 1 });
-
 export const CategoryModel =
   mongoose.models.Category ||
   mongoose.model<ICategory>("Category", categorySchema);
