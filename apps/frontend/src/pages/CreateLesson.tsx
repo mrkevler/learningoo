@@ -285,9 +285,9 @@ const CreateLessonPage = () => {
             type="button"
             onClick={handleSave}
             className="btn-primary w-full sm:w-auto"
-            disabled={mutation.isLoading}
+            disabled={mutation.isPending}
           >
-            {mutation.isLoading ? "Saving..." : "Save Lesson"}
+            {mutation.isPending ? "Saving..." : "Save Lesson"}
           </button>
         </div>
       </div>
