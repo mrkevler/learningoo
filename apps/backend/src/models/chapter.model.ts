@@ -7,6 +7,7 @@ export interface IChapter extends Document {
   order: number;
   createdAt: Date;
   updatedAt: Date;
+  coverImage?: string;
 }
 
 const chapterSchema = new Schema<IChapter>(
@@ -15,6 +16,7 @@ const chapterSchema = new Schema<IChapter>(
     description: String,
     courseId: { type: Schema.Types.ObjectId, ref: "Course", required: true },
     order: { type: Number, default: 0 },
+    coverImage: { type: String },
   },
   { timestamps: true }
 );

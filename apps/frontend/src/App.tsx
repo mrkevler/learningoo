@@ -10,9 +10,17 @@ import RegisterPage from "./pages/Register";
 import ProfilePage from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PricingPage from "./pages/Pricing";
-import TutorialsPage from "./pages/Tutorials";
-import MyCoursesPage from "./pages/MyCourses";
+import CoursesPage from "./pages/Courses";
 import PrivacyPage from "./pages/Privacy";
+import MyCoursesPage from "./pages/MyCourses";
+import AuthorSetupPage from "./pages/AuthorSetup";
+import CourseDetailPage from "./pages/CourseDetail";
+import CreateCoursePage from "./pages/CreateCourse";
+import ChapterDetailPage from "./pages/ChapterDetail";
+import AuthorPage from "./pages/AuthorPage";
+import LessonDetailPage from "./pages/LessonDetail";
+import CreateLessonPage from "./pages/CreateLesson";
+import EditLessonPage from "./pages/EditLesson";
 
 const App = () => {
   const theme = useAppSelector((s) => s.ui.theme);
@@ -27,14 +35,28 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/tutorials" element={<TutorialsPage />} />
+        <Route path="/tutorials" element={<CoursesPage />} />
+        <Route path="/courses" element={<CoursesPage />} />
+        <Route path="/courses/:slug" element={<CourseDetailPage />} />
+        <Route path="/chapters/:id" element={<ChapterDetailPage />} />
+        {/* Lesson public route */}
+        <Route path="/lessons/:id" element={<LessonDetailPage />} />
+        <Route path="/lessons/:id/edit" element={<EditLessonPage />} />
+        <Route path="/author/:id" element={<AuthorPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<RegisterPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/setup-author" element={<AuthorSetupPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-courses" element={<MyCoursesPage />} />
+          <Route path="/my-courses/new" element={<CreateCoursePage />} />
+          {/* Create lesson – only authenticated users (course authors) */}
+          <Route
+            path="/chapters/:id/lessons/new"
+            element={<CreateLessonPage />}
+          />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

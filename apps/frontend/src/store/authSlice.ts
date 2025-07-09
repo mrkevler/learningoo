@@ -9,6 +9,10 @@ interface User {
   licenseId?: string;
   createdAt?: string;
   lastLoginAt?: string;
+  authorName?: string;
+  bio?: string;
+  categories?: string[];
+  balance?: number;
 }
 interface AuthState {
   user: User | null;
@@ -17,9 +21,11 @@ interface AuthState {
   error?: string;
 }
 
+const savedToken = localStorage.getItem("token");
+const savedUserStr = localStorage.getItem("user");
 const initialState: AuthState = {
-  user: null,
-  token: null,
+  user: savedUserStr ? (JSON.parse(savedUserStr) as User) : null,
+  token: savedToken,
   status: "idle",
   error: undefined,
 };
@@ -38,12 +44,19 @@ export const registerThunk = createAsyncThunk(
     name,
     email,
     password,
+    role,
   }: {
     name: string;
     email: string;
     password: string;
+    role: "student" | "tutor";
   }) => {
-    const res = await api.post("/auth/register", { name, email, password });
+    const res = await api.post("/auth/register", {
+      name,
+      email,
+      password,
+      role,
+    });
     return res.data as { token: string; user: User };
   }
 );
@@ -58,6 +71,27 @@ export const assignLicenseThunk = createAsyncThunk(
   }
 );
 
+export const updateAuthorThunk = createAsyncThunk(
+  "auth/updateAuthor",
+  async (
+    {
+      authorName,
+      bio,
+      categories,
+    }: { authorName: string; bio?: string; categories?: string[] },
+    { getState }
+  ) => {
+    const state = getState() as { auth: AuthState };
+    const userId = state.auth.user?._id as string;
+    const res = await api.put(`/users/${userId}`, {
+      authorName,
+      bio,
+      categories,
+    });
+    return res.data as User;
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -67,6 +101,11 @@ const authSlice = createSlice({
       state.user = null;
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+    },
+    setUser(state, action) {
+      state.user = action.payload;
+      if (action.payload)
+        localStorage.setItem("user", JSON.stringify(action.payload));
     },
   },
   extraReducers: (builder) => {
@@ -96,9 +135,13 @@ const authSlice = createSlice({
     });
     builder.addCase(assignLicenseThunk.fulfilled, (state, action) => {
       state.user = action.payload;
+      localStorage.setItem("user", JSON.stringify(action.payload));
+    });
+    builder.addCase(updateAuthorThunk.fulfilled, (state, action) => {
+      state.user = action.payload;
     });
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setUser } = authSlice.actions;
 export default authSlice.reducer;
