@@ -42,10 +42,10 @@ export const postContact = async (req: Request, res: Response) => {
 
   try {
     await sendContactEmail({
-      name,
-      email,
+      name: name || "",
+      email: email || "",
       phone: prefix ? `${prefix} ${phone}` : phone,
-      message,
+      message: message || "",
     });
     return res.json({ ok: true });
   } catch (e) {
