@@ -15,7 +15,7 @@ export const transporter = nodemailer.createTransport({
 export const sendContactEmail = async (data: {
   name: string;
   email: string;
-  phone?: string;
+  phone?: string | undefined;
   message: string;
 }) => {
   const html = `<p><strong>Name:</strong> ${data.name}</p>

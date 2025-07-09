@@ -41,12 +41,26 @@ export const postContact = async (req: Request, res: Response) => {
   if (!isValid) return res.status(400).json({ error: "Captcha failed" });
 
   try {
-    await sendContactEmail({
-      name: name || "",
-      email: email || "",
-      phone: prefix ? `${prefix} ${phone}` : phone,
-      message: message || "",
-    });
+    // ensure required strings are never undefined
+    const safeName = name ?? "";
+    const safeEmail = email ?? "";
+    const safeMessage = message ?? "";
+
+    const phoneValue = phone
+      ? prefix
+        ? `${prefix} ${phone}`
+        : phone
+      : undefined;
+
+    // build payload with phone only when defined
+    const payload = {
+      name: safeName,
+      email: safeEmail,
+      message: safeMessage,
+      phone: phoneValue ?? "",
+    };
+
+    await sendContactEmail(payload);
     return res.json({ ok: true });
   } catch (e) {
     console.error("Email send error", e);
