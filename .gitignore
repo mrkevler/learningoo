@@ -1,6 +1,8 @@
 # === SECRETS ===
 backend/.env
 frontend/.env
+.env.production
+.env.render_netlify
 
 # === GENERAL ===
 docs/
