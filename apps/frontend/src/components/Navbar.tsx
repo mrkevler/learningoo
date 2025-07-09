@@ -2,6 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../store";
 import { toggleTheme } from "../store/uiSlice";
+import { logout } from "../store/authSlice";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
 import useIdleLogout from "../hooks/useIdleLogout";
 
@@ -47,12 +48,12 @@ const Navbar = () => {
           </li>
           <li>
             <NavLink
-              to="/tutorials"
+              to="/courses"
               className={({ isActive }) =>
                 `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
               }
             >
-              Tutorials
+              Courses
             </NavLink>
           </li>
           <li>
@@ -65,16 +66,18 @@ const Navbar = () => {
               Pricing
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/login"
-              className={({ isActive }) =>
-                `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
-              }
-            >
-              Login
-            </NavLink>
-          </li>
+          {!user && (
+            <li>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
+                }
+              >
+                Login
+              </NavLink>
+            </li>
+          )}
           {!user && (
             <li>
               <Link
@@ -86,14 +89,19 @@ const Navbar = () => {
             </li>
           )}
           {user && (
-            <li>
-              <Link
-                to="/profile"
-                className="flex items-center justify-center h-9 w-9 rounded-full bg-accent-pink text-white font-bold hover:opacity-90"
-              >
-                {user.name.charAt(0).toUpperCase()}
-              </Link>
-            </li>
+            <>
+              <li className="text-accent-pink font-semibold">
+                ${user.balance ?? 0}
+              </li>
+              <li>
+                <Link
+                  to="/profile"
+                  className="flex items-center justify-center h-9 w-9 rounded-full bg-accent-pink text-white font-bold hover:opacity-90"
+                >
+                  {user.name.charAt(0).toUpperCase()}
+                </Link>
+              </li>
+            </>
           )}
           {user?.role === "tutor" && (
             <li>
@@ -119,6 +127,16 @@ const Navbar = () => {
               )}
             </button>
           </li>
+          {user && (
+            <li>
+              <button
+                onClick={() => dispatch(logout())}
+                className="hover:text-accent-purple"
+              >
+                Logout
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
     </header>

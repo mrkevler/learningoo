@@ -7,53 +7,93 @@ import { Link, useNavigate } from "react-router-dom";
 const placeholder =
   "https://cataas.com/cat/says/No%20Image?size=70&color=white&json=true";
 
+// Helper to determine if user is tutor
+const isTutor = (role?: string) => role === "tutor";
+
 const MyCoursesPage = () => {
   const user = useAppSelector((s) => s.auth.user);
   const navigate = useNavigate();
   if (!user) return null;
-  if (user.role !== "tutor") {
-    return (
-      <Layout>
-        <div className="py-20 text-center">
-          <p className="text-gray-500">
-            You need to be a tutor to create courses.
-          </p>
-          <Link to="/pricing" className="text-brand underline">
-            Upgrade plan
-          </Link>
-        </div>
-      </Layout>
-    );
-  }
 
-  const { data } = useQuery({
-    queryKey: ["myCourses"],
+  // Fetch all courses – reused for both roles
+  const { data: allCourses } = useQuery({
+    queryKey: ["courses"],
     queryFn: () => api.get("/courses").then((r) => r.data),
   });
 
-  const myCourses = data?.filter((c: any) => c.tutorId === user._id) || [];
+  // For students we need enrollments
+  const { data: enrollments } = useQuery({
+    enabled: !isTutor(user.role),
+    queryKey: ["myEnrollments"],
+    queryFn: () => api.get("/enrollments").then((r) => r.data),
+  });
+
+  let myCourses: any[] = [];
+  if (allCourses) {
+    if (isTutor(user.role)) {
+      myCourses = allCourses.filter((c: any) => c.tutorId === user._id);
+    } else if (enrollments) {
+      const myIds = enrollments
+        .filter((e: any) => {
+          const sid =
+            typeof e.studentId === "object"
+              ? e.studentId.toString()
+              : String(e.studentId);
+          return sid === user._id;
+        })
+        .map((e: any) =>
+          typeof e.courseId === "object"
+            ? e.courseId.toString()
+            : String(e.courseId)
+        );
+      myCourses = allCourses.filter((c: any) => myIds.includes(c._id));
+    }
+  }
+
+  // Determine empty state text/button
+  const emptyStateTutor = (
+    <p className="text-gray-500">You don't have any courses yet.</p>
+  );
+  const emptyStateStudent = (
+    <div className="space-y-4 text-center">
+      <p className="text-gray-500">You haven't enrolled in any courses yet.</p>
+      <Link
+        to="/courses"
+        className="inline-block bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark"
+      >
+        Find Courses
+      </Link>
+    </div>
+  );
 
   return (
     <Layout>
       <div className="py-10 container mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">My Courses</h1>
-          <button
-            onClick={() => navigate("/my-courses/new")}
-            className="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark"
-          >
-            + Create Course
-          </button>
+          {isTutor(user.role) && (
+            <button
+              onClick={() => navigate("/my-courses/new")}
+              className="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark"
+            >
+              + Create Course
+            </button>
+          )}
         </div>
 
         {myCourses.length === 0 ? (
-          <p className="text-gray-500">You don't have any courses yet.</p>
+          isTutor(user.role) ? (
+            emptyStateTutor
+          ) : (
+            emptyStateStudent
+          )
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {myCourses.map((c: any) => (
-              <div
+              <Link
+                to={`/courses/${c.slug}`}
                 key={c._id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow hover-scale block"
               >
                 <img
                   src={c.coverImage || `https://cataas.com/cat?${c._id}`}
@@ -69,7 +109,7 @@ const MyCoursesPage = () => {
                     {new Date(c.createdAt).toLocaleDateString()}
                   </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

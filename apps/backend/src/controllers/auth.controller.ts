@@ -7,7 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 const JWT_SECRET = process.env.JWT_SECRET || "devsecret";
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role: requestedRole } = req.body;
   const existing = await UserModel.findOne({ email });
   if (existing) return res.status(409).json({ message: "Email already used" });
   const hashed = await bcrypt.hash(password, 10);
@@ -15,7 +15,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
     name,
     email,
     password: hashed,
-    role: "student",
+    role: requestedRole === "tutor" ? "tutor" : "student",
   });
   const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, {
     expiresIn: "7d",
@@ -27,6 +27,10 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      authorName: user.authorName,
+      bio: user.bio,
+      categories: user.categories,
+      balance: user.balance,
     },
   });
 });
@@ -47,6 +51,10 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      authorName: user.authorName,
+      bio: user.bio,
+      categories: user.categories,
+      balance: user.balance,
     },
   });
 });

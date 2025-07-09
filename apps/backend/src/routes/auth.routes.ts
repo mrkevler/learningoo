@@ -11,6 +11,7 @@ router.post(
     body("password")
       .isLength({ min: 6 })
       .withMessage("Password must be at least 6 characters"),
+    body("role").optional().isIn(["student", "tutor"]),
   ],
   register
 );

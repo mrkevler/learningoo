@@ -12,6 +12,7 @@ const schema = z
     email: z.string().email(),
     password: z.string().min(6, "Minimum 6 characters"),
     confirmPassword: z.string(),
+    publishCourses: z.boolean().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -29,8 +30,20 @@ const RegisterPage = () => {
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
   const onSubmit = async (data: FormData) => {
-    const res = await dispatch(registerThunk(data));
-    if (registerThunk.fulfilled.match(res)) navigate("/profile");
+    const role = data.publishCourses ? "tutor" : "student";
+    const res = await dispatch(
+      registerThunk({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role,
+      })
+    );
+    if (registerThunk.fulfilled.match(res)) {
+      alert("Congrats! You've received $100 free credits");
+      const destination = role === "tutor" ? "/pricing" : "/profile";
+      navigate(destination);
+    }
   };
   return (
     <Layout>
@@ -87,6 +100,18 @@ const RegisterPage = () => {
                 {errors.confirmPassword.message}
               </p>
             )}
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              {...register("publishCourses")}
+              id="publishCourses"
+              className="form-checkbox text-brand focus:ring-brand h-4 w-4"
+              style={{ accentColor: "#ff0099" }}
+            />
+            <label htmlFor="publishCourses" className="text-white">
+              Do you want to publish courses?
+            </label>
           </div>
           <button
             type="submit"

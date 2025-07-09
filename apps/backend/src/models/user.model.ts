@@ -7,6 +7,10 @@ export interface IUser extends Document {
   role: "admin" | "tutor" | "student";
   isActive: boolean;
   isDeleted: boolean;
+  authorName?: string;
+  bio?: string;
+  balance: number;
+  categories: Schema.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
   licenseId?: Schema.Types.ObjectId;
@@ -25,6 +29,10 @@ const userSchema = new Schema<IUser>(
     isActive: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
     licenseId: { type: Schema.Types.ObjectId, ref: "License", default: null },
+    authorName: { type: String, trim: true, default: null },
+    bio: { type: String, default: null },
+    categories: [{ type: Schema.Types.ObjectId, ref: "Category", default: [] }],
+    balance: { type: Number, default: 100 },
   },
   { timestamps: true }
 );

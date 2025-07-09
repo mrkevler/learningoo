@@ -6,10 +6,13 @@ export interface ICourse extends Document {
   description?: string;
   categoryId: Types.ObjectId;
   coverImage: string;
+  photos?: string[];
   price: number;
   tutorId: Types.ObjectId;
   isPublished: boolean;
   isDeleted: boolean;
+  welcomeEmailSubject?: string;
+  welcomeEmailBody?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +28,9 @@ const courseSchema = new Schema<ICourse>(
       required: true,
     },
     coverImage: { type: String },
+    photos: { type: [String], default: [] },
+    welcomeEmailSubject: { type: String },
+    welcomeEmailBody: { type: String },
     price: { type: Number, default: 0 },
     tutorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     isPublished: { type: Boolean, default: false },

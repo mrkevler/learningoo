@@ -158,7 +158,8 @@ const ContactForm = () => {
             name="gdpr"
             checked={form.gdpr}
             onChange={handleChange}
-            className="h-4 w-4 rounded  dark:text-white border-gray-300 dark:border-gray-600"
+            className="form-checkbox text-brand focus:ring-brand h-4 w-4"
+            style={{ accentColor: "#ff0099" }}
           />
           I agree to the&nbsp;
           <a href="/privacy" className="text-accent-purple underline">
