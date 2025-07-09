@@ -29,7 +29,7 @@ export const postContact = async (req: Request, res: Response) => {
     return res.status(422).json({ error: errors.array()[0].msg });
   }
 
-  const { allowed, wait } = canSubmit(req.ip);
+  const { allowed, wait } = canSubmit(req.ip ?? "");
   if (!allowed) return res.status(429).json({ error: "Please wait", wait });
 
   const { answer, token, name, email, prefix, phone, message } =
