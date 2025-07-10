@@ -21,6 +21,9 @@ import AuthorPage from "./pages/AuthorPage";
 import LessonDetailPage from "./pages/LessonDetail";
 import CreateLessonPage from "./pages/CreateLesson";
 import EditLessonPage from "./pages/EditLesson";
+import AdminRoute from "./components/AdminRoute";
+import AdminDashboard from "./pages/AdminDashboard";
+import EditCoursePage from "./pages/EditCourse";
 
 const App = () => {
   const theme = useAppSelector((s) => s.ui.theme);
@@ -52,11 +55,15 @@ const App = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/my-courses" element={<MyCoursesPage />} />
           <Route path="/my-courses/new" element={<CreateCoursePage />} />
+          <Route path="/my-courses/:id/edit" element={<EditCoursePage />} />
           {/* Create lesson – only authenticated users (course authors) */}
           <Route
             path="/chapters/:id/lessons/new"
             element={<CreateLessonPage />}
           />
+        </Route>
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminDashboard />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

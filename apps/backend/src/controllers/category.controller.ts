@@ -15,3 +15,26 @@ export const createCategory = asyncHandler(
     res.status(201).json(cat);
   }
 );
+
+export const updateCategory = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { name, slug } = req.body;
+    const cat = await CategoryModel.findById(id);
+    if (!cat) return res.status(404).json({ message: "Category not found" });
+    if (name !== undefined) cat.name = name;
+    if (slug !== undefined) cat.slug = slug;
+    await cat.save();
+    res.json(cat);
+  }
+);
+
+export const deleteCategory = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const cat = await CategoryModel.findById(id);
+    if (!cat) return res.status(404).json({ message: "Category not found" });
+    await cat.deleteOne();
+    res.json({ message: "deleted" });
+  }
+);

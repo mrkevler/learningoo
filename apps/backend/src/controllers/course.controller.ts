@@ -9,8 +9,23 @@ export const getCourses = asyncHandler(async (_req: Request, res: Response) => {
 });
 
 export const getCourse = asyncHandler(async (req: Request, res: Response) => {
-  const course = await CourseModel.findById(req.params.id);
-  if (!course) return res.status(404).json({ message: "Course not found" });
+  const course: any = await CourseModel.findById(req.params.id)
+    .populate("categoryId", "name slug")
+    .populate("tutorId", "name authorName")
+    .lean();
+
+  if (!course) {
+    return res.status(404).json({ message: "Course not found" });
+  }
+
+  // Fetch chapters (ordered) with all details for editing
+  const chapters = await ChapterModel.find({ courseId: course._id })
+    .sort({ order: 1 })
+    .select("title coverImage order _id")
+    .lean();
+
+  course.chapters = chapters;
+
   res.json(course);
 });
 
@@ -40,15 +55,34 @@ export const createCourse = asyncHandler(
 
 export const updateCourse = asyncHandler(
   async (req: Request, res: Response) => {
+    const { chapters = [], ...courseData } = req.body;
+
     const course = await CourseModel.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      courseData,
       {
         new: true,
         runValidators: true,
       }
     );
+
     if (!course) return res.status(404).json({ message: "Course not found" });
+
+    // Handle chapters update if provided
+    if (Array.isArray(chapters) && chapters.length > 0) {
+      // Remove existing chapters for this course
+      await ChapterModel.deleteMany({ courseId: course._id });
+
+      // Create new chapters
+      const docs = chapters.map((ch: any, idx: number) => ({
+        title: ch.title,
+        coverImage: ch.coverImage,
+        courseId: course._id,
+        order: idx + 1,
+      }));
+      await ChapterModel.insertMany(docs);
+    }
+
     res.json(course);
   }
 );
