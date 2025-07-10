@@ -6,13 +6,13 @@ import Layout from "../components/Layout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../services/api";
 import { useAppSelector } from "../store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const schema = z.object({
   title: z.string().min(3, "Too short"),
   coverImage: z.string().url({ message: "Missing field" }),
   categoryId: z.string({ required_error: "Select category" }),
-  description: z.string().min(10),
+  description: z.string().min(40),
   photos: z.array(z.string()).min(1, "Missing field"),
   welcomeEmailBody: z.string().min(10, "Enter body"),
   price: z.number().min(0),
@@ -21,6 +21,7 @@ const schema = z.object({
       z.object({
         title: z.string().min(2),
         coverImage: z.string().url({ message: "Missing field" }),
+        _id: z.string().optional(),
       })
     )
     .min(1),
@@ -32,11 +33,20 @@ type FormData = z.infer<typeof schema>;
 const catLandscape = () =>
   `https://cataas.com/cat?width=800&height=450&rand=${Math.random()}`;
 
-const CreateCoursePage = () => {
+const EditCoursePage = () => {
+  const { id } = useParams();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: () => api.get("/categories").then((r) => r.data),
+  });
+
+  const { data: course, isLoading } = useQuery({
+    queryKey: ["course", id],
+    enabled: !!id,
+    queryFn: () => api.get(`/courses/${id}`).then((r) => r.data),
   });
 
   const {
@@ -47,6 +57,7 @@ const CreateCoursePage = () => {
     getValues,
     setValue,
     watch,
+    reset,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -63,18 +74,41 @@ const CreateCoursePage = () => {
     },
   });
 
+  // Populate form when course data loads
+  useEffect(() => {
+    if (course) {
+      reset({
+        title: course.title || "",
+        coverImage: course.coverImage || "",
+        categoryId: course.categoryId || "",
+        description: course.description || "",
+        photos: course.photos || [],
+        welcomeEmailBody: course.welcomeEmailBody || "",
+        price: course.price || 0,
+        chapters:
+          course.chapters?.length > 0
+            ? course.chapters.map((ch: any) => ({
+                title: ch.title || "",
+                coverImage: ch.coverImage || "",
+                _id: ch._id,
+              }))
+            : [{ title: "", coverImage: "" }],
+      });
+    }
+  }, [course, reset]);
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "chapters",
   });
 
-  const navigate = useNavigate();
   const mutation = useMutation({
     mutationFn: (data: FormData) =>
-      api.post("/courses", data).then((r) => r.data),
-    onSuccess: (created) => {
+      api.put(`/courses/${id}`, data).then((r) => r.data),
+    onSuccess: (updated) => {
+      queryClient.invalidateQueries({ queryKey: ["course", id] });
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      navigate(`/courses/${created.slug}`);
+      navigate(`/courses/${updated.slug || course.slug}`);
     },
   });
 
@@ -89,7 +123,6 @@ const CreateCoursePage = () => {
   const onSubmit = (data: FormData) => {
     const payload = {
       ...data,
-      tutorId: user?._id,
       slug: slugify(data.title),
       welcomeEmailSubject: `Welcome {userName} on the course: ${data.title}`,
       price: data.price,
@@ -140,10 +173,15 @@ const CreateCoursePage = () => {
     }
   };
 
+  if (isLoading) return <Layout>Loading...</Layout>;
+  if (!course) return <Layout>Course not found</Layout>;
+
+  const existingChaptersCount = course.chapters?.length || 0;
+
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto py-10">
-        <h1 className="text-3xl font-bold text-brand mb-6">Create Course</h1>
+      <div className="max-w-4xl mx-auto py-10">
+        <h1 className="text-3xl font-bold text-brand mb-6">Edit Course</h1>
         <form
           onKeyDown={handleFormKey}
           onSubmit={handleSubmit(onSubmit)}
@@ -257,7 +295,7 @@ const CreateCoursePage = () => {
             </label>
             <button
               type="button"
-              className="bg-brand text-white px-3 py-1 rounded mb-2 border border-brand-dark hover:border-brand"
+              className="bg-brand text-white px-3 py-1 rounded mb-2"
               onClick={() => {
                 const current = getValues("photos") || [];
                 setValue("photos", [...current, catLandscape()]);
@@ -301,7 +339,6 @@ const CreateCoursePage = () => {
             </p>
             <p className="mb-3 italic text-brand-dark">
               {`Welcome {userName} on the course: ${getValues("title") || "<course title>"}`}
-              {/* add domain name to the beginning of the relative path and change logic to sending emails in production ;) */}
             </p>
             <label className="block mb-1 text-gray-800 dark:text-gray-100">
               Welcome Message Body
@@ -318,85 +355,140 @@ const CreateCoursePage = () => {
             )}
           </div>
 
-          {/* Chapters */}
+          {/* Chapters Table */}
           <div className="space-y-4">
-            <label className="block font-semibold text-gray-800 dark:text-gray-100">
-              Chapters
-            </label>
-            {fields.map((field, idx) => (
-              <div
-                key={field.id}
-                className="border p-4 rounded bg-gray-100 dark:bg-gray-800"
+            <div className="flex justify-between items-center">
+              <label className="block font-semibold text-gray-800 dark:text-gray-100">
+                Chapters
+              </label>
+              <button
+                type="button"
+                onClick={() =>
+                  append({
+                    title: "",
+                    coverImage: catLandscape(),
+                  })
+                }
+                className="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark"
               >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-100">
-                    Chapter {idx + 1}
-                  </h3>
-                  {idx > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => remove(idx)}
-                      className="text-red-500"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-                <input
-                  type="text"
-                  placeholder="Chapter Title"
-                  {...register(`chapters.${idx}.title` as const)}
-                  className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white mb-2 focus:ring-2 focus:ring-brand"
-                />
-                <div className="flex items-center gap-2 mb-2">
-                  <input
-                    type="text"
-                    {...register(`chapters.${idx}.coverImage` as const)}
-                    className={`w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-brand ${errors.chapters?.[idx]?.coverImage ? "border border-red-500" : ""}`}
-                  />
-                  <img
-                    src={watch(`chapters.${idx}.coverImage`) || catLandscape()}
-                    alt="chap"
-                    className="h-12 w-12 object-cover rounded cursor-pointer"
-                    onClick={() =>
-                      setValue(`chapters.${idx}.coverImage`, catLandscape())
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setValue(`chapters.${idx}.coverImage`, catLandscape())
-                    }
-                    className="bg-gray-700 text-white px-2 py-1 rounded"
-                  >
-                    Upload image
-                  </button>
-                </div>
-                {errors.chapters?.[idx]?.coverImage && (
-                  <p className="text-red-500 text-xs">Missing field</p>
-                )}
+                + Add Chapter {fields.length + 1}
+              </button>
+            </div>
+
+            {fields.length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="w-full border border-gray-300 dark:border-gray-600 rounded-lg">
+                  <thead className="bg-gray-100 dark:bg-gray-800">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-gray-800 dark:text-gray-100 font-semibold">
+                        #
+                      </th>
+                      <th className="px-4 py-3 text-left text-gray-800 dark:text-gray-100 font-semibold">
+                        Cover
+                      </th>
+                      <th className="px-4 py-3 text-left text-gray-800 dark:text-gray-100 font-semibold">
+                        Title
+                      </th>
+                      <th className="px-4 py-3 text-left text-gray-800 dark:text-gray-100 font-semibold">
+                        Cover Image URL
+                      </th>
+                      <th className="px-4 py-3 text-center text-gray-800 dark:text-gray-100 font-semibold">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {fields.map((field, idx) => (
+                      <tr
+                        key={field.id}
+                        className="border-t border-gray-200 dark:border-gray-700"
+                      >
+                        <td className="px-4 py-3 text-gray-800 dark:text-gray-100 font-medium">
+                          {idx + 1}
+                        </td>
+                        <td className="px-4 py-3">
+                          <img
+                            src={
+                              watch(`chapters.${idx}.coverImage`) ||
+                              catLandscape()
+                            }
+                            alt="chapter cover"
+                            className="h-16 w-16 object-cover rounded cursor-pointer"
+                            onClick={() =>
+                              setValue(
+                                `chapters.${idx}.coverImage`,
+                                catLandscape()
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="px-4 py-3">
+                          <input
+                            type="text"
+                            placeholder="Chapter Title"
+                            {...register(`chapters.${idx}.title` as const)}
+                            className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-brand"
+                          />
+                          {errors.chapters?.[idx]?.title && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Required
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              {...register(
+                                `chapters.${idx}.coverImage` as const
+                              )}
+                              className={`flex-1 p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-brand ${errors.chapters?.[idx]?.coverImage ? "border border-red-500" : ""}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setValue(
+                                  `chapters.${idx}.coverImage`,
+                                  catLandscape()
+                                )
+                              }
+                              className="bg-gray-700 text-white px-2 py-1 rounded text-sm hover:bg-gray-600"
+                            >
+                              New
+                            </button>
+                          </div>
+                          {errors.chapters?.[idx]?.coverImage && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Valid URL required
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {fields.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => remove(idx)}
+                              className="text-red-500 hover:text-red-700 font-medium"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                append({
-                  title: "",
-                  coverImage: "",
-                })
-              }
-              className="bg-gray-700 text-white px-4 py-2 rounded"
-            >
-              + Add another chapter
-            </button>
+            )}
           </div>
 
           <button
             type="submit"
             tabIndex={-1}
             className="bg-brand text-white px-6 py-2 rounded"
+            disabled={mutation.isPending}
           >
-            Create Course
+            {mutation.isPending ? "Updating..." : "Update Course"}
           </button>
         </form>
       </div>
@@ -404,4 +496,4 @@ const CreateCoursePage = () => {
   );
 };
 
-export default CreateCoursePage;
+export default EditCoursePage;

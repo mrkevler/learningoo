@@ -10,6 +10,16 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const theme = useAppSelector((s) => s.ui.theme);
   const user = useAppSelector((s) => s.auth.user);
+  const token = useAppSelector((s) => s.auth.token);
+  const adminToken = (() => {
+    if (!token) return false;
+    try {
+      const role = JSON.parse(atob(token.split(".")[1])).role;
+      return role === "admin";
+    } catch {
+      return false;
+    }
+  })();
   const dispatch = useAppDispatch();
 
   useIdleLogout(Boolean(user));
@@ -103,7 +113,7 @@ const Navbar = () => {
               </li>
             </>
           )}
-          {user?.role === "tutor" && (
+          {user && (
             <li>
               <NavLink
                 to="/my-courses"
@@ -112,6 +122,18 @@ const Navbar = () => {
                 }
               >
                 My Courses
+              </NavLink>
+            </li>
+          )}
+          {(user?.role === "admin" || adminToken) && (
+            <li>
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `hover:text-accent-purple ${isActive ? "text-accent-purple" : ""}`
+                }
+              >
+                Dashboard
               </NavLink>
             </li>
           )}

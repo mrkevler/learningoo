@@ -44,3 +44,18 @@ export const assignLicense = asyncHandler(
     res.json({ message: "upgraded", license: lic, user });
   }
 );
+
+export const updateLicense = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { price, courseLimit, chapterLimit, lessonLimit } = req.body;
+    const lic = await LicenseModel.findById(id);
+    if (!lic) return res.status(404).json({ message: "License not found" });
+    if (price !== undefined) lic.price = price;
+    if (courseLimit !== undefined) lic.courseLimit = courseLimit;
+    if (chapterLimit !== undefined) lic.chapterLimit = chapterLimit;
+    if (lessonLimit !== undefined) lic.lessonLimit = lessonLimit;
+    await lic.save();
+    res.json(lic);
+  }
+);

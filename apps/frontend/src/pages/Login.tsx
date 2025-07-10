@@ -25,6 +25,11 @@ const LoginPage = () => {
   const onSubmit = async (data: FormData) => {
     const res = await dispatch(loginThunk(data));
     if (loginThunk.fulfilled.match(res)) navigate("/profile");
+    if (loginThunk.rejected.match(res)) {
+      if (res.error.message?.includes("503")) {
+        alert("Login temporarily disabled, please contact admin");
+      }
+    }
   };
   return (
     <Layout>

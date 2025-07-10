@@ -24,5 +24,6 @@ router.use("/licenses", licenseRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/", contactRoutes);
 router.use("/transactions", transactionRoutes);
+router.use("/admin", require("./admin.routes").default);
 
 export default router;

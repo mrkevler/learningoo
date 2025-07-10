@@ -4,11 +4,13 @@ import Footer from "./Footer";
 
 interface Props {
   children: ReactNode;
+  transparent?: boolean;
 }
 
-const Layout = ({ children }: Props) => {
+const Layout = ({ children, transparent = false }: Props) => {
+  const bgClass = transparent ? "" : "bg-white dark:bg-surface";
   return (
-    <div className="flex flex-col min-h-screen bg-white dark:bg-surface text-foreground">
+    <div className={`flex flex-col min-h-screen ${bgClass} text-foreground`}>
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-6">{children}</main>
       <Footer />

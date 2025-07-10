@@ -23,16 +23,29 @@ const MyCoursesPage = () => {
 
   // For students we need enrollments
   const { data: enrollments } = useQuery({
-    enabled: !isTutor(user.role),
+    enabled: !!user,
     queryKey: ["myEnrollments"],
-    queryFn: () => api.get("/enrollments").then((r) => r.data),
+    queryFn: () =>
+      api
+        .get("/enrollments", { params: { studentId: user._id } })
+        .then((r) => r.data),
   });
-
   let myCourses: any[] = [];
+  if (allCourses && enrollments) {
+    const myIds = enrollments.map((e: any) =>
+      typeof e.courseId === "object"
+        ? e.courseId.toString()
+        : String(e.courseId)
+    );
+    myCourses = allCourses.filter((c: any) => myIds.includes(c._id));
+  }
+
+  // after fetch myCourses logic compute authoredCourses and enrolledCourses for tutor
+  let authored: any[] = [];
+  let enrolled: any[] = [];
   if (allCourses) {
-    if (isTutor(user.role)) {
-      myCourses = allCourses.filter((c: any) => c.tutorId === user._id);
-    } else if (enrollments) {
+    authored = allCourses.filter((c: any) => c.tutorId === user._id);
+    if (enrollments) {
       const myIds = enrollments
         .filter((e: any) => {
           const sid =
@@ -46,7 +59,10 @@ const MyCoursesPage = () => {
             ? e.courseId.toString()
             : String(e.courseId)
         );
-      myCourses = allCourses.filter((c: any) => myIds.includes(c._id));
+      enrolled = allCourses.filter((c: any) => myIds.includes(c._id));
+    }
+    if (isTutor(user.role)) {
+      // authored and enrolled already computed
     }
   }
 
@@ -66,6 +82,28 @@ const MyCoursesPage = () => {
     </div>
   );
 
+  // define renderCard function at top inside component
+  const renderCard = (c: any) => (
+    <Link
+      to={`/courses/${c.slug}`}
+      key={c._id}
+      className="bg-white dark:bg-gray-800 rounded-lg shadow hover-scale block"
+    >
+      <img
+        src={c.coverImage || `https://cataas.com/cat?${c._id}`}
+        alt="cover"
+        className="h-40 w-full object-cover rounded-t-lg"
+      />
+      <div className="p-4 space-y-2">
+        <h3 className="font-semibold text-lg">{c.title}</h3>
+        <p className="text-sm text-gray-500 line-clamp-2">{c.description}</p>
+        <span className="text-xs text-gray-400">
+          {new Date(c.createdAt).toLocaleDateString()}
+        </span>
+      </div>
+    </Link>
+  );
+
   return (
     <Layout>
       <div className="py-10 container mx-auto">
@@ -81,36 +119,30 @@ const MyCoursesPage = () => {
           )}
         </div>
 
-        {myCourses.length === 0 ? (
-          isTutor(user.role) ? (
-            emptyStateTutor
-          ) : (
-            emptyStateStudent
-          )
+        {isTutor(user.role) ? (
+          <>
+            <h2 className="text-2xl font-semibold mb-4">My Products</h2>
+            {authored.length === 0 ? (
+              emptyStateTutor
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                {authored.map(renderCard)}
+              </div>
+            )}
+            <h2 className="text-2xl font-semibold mb-4">My Courses</h2>
+            {enrolled.length === 0 ? (
+              emptyStateStudent
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {enrolled.map(renderCard)}
+              </div>
+            )}
+          </>
+        ) : myCourses.length === 0 ? (
+          emptyStateStudent
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {myCourses.map((c: any) => (
-              <Link
-                to={`/courses/${c.slug}`}
-                key={c._id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow hover-scale block"
-              >
-                <img
-                  src={c.coverImage || `https://cataas.com/cat?${c._id}`}
-                  alt="cover"
-                  className="h-40 w-full object-cover rounded-t-lg"
-                />
-                <div className="p-4 space-y-2">
-                  <h3 className="font-semibold text-lg">{c.title}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-2">
-                    {c.description}
-                  </p>
-                  <span className="text-xs text-gray-400">
-                    {new Date(c.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </Link>
-            ))}
+            {myCourses.map(renderCard)}
           </div>
         )}
       </div>

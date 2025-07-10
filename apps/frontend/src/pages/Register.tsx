@@ -40,9 +40,15 @@ const RegisterPage = () => {
       })
     );
     if (registerThunk.fulfilled.match(res)) {
-      alert("Congrats! You've received $100 free credits");
-      const destination = role === "tutor" ? "/pricing" : "/profile";
+      alert(
+        `Congrats! You've received $${(res.payload.user as any).balance} free credits`
+      );
+      const destination = role === "tutor" ? "/pricing" : "/my-courses";
       navigate(destination);
+    } else if (registerThunk.rejected.match(res)) {
+      if (res.error.message?.includes("503")) {
+        alert("Registration temporarily disabled, please contact admin");
+      }
     }
   };
   return (

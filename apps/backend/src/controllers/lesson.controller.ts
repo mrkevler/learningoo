@@ -8,7 +8,16 @@ export const getLessons = asyncHandler(async (_req: Request, res: Response) => {
 });
 
 export const getLesson = asyncHandler(async (req: Request, res: Response) => {
-  const lesson = await LessonModel.findById(req.params.id);
+  const lesson = await LessonModel.findById(req.params.id)
+    .populate({
+      path: "chapterId",
+      populate: {
+        path: "courseId",
+        select: "tutorId title",
+      },
+    })
+    .lean();
+
   if (!lesson) return res.status(404).json({ message: "Lesson not found" });
   res.json(lesson);
 });
@@ -25,10 +34,7 @@ export const updateLesson = asyncHandler(
     const lesson = await LessonModel.findByIdAndUpdate(
       req.params.id,
       req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
+      { new: true }
     );
     if (!lesson) return res.status(404).json({ message: "Lesson not found" });
     res.json(lesson);
@@ -39,6 +45,6 @@ export const deleteLesson = asyncHandler(
   async (req: Request, res: Response) => {
     const lesson = await LessonModel.findByIdAndDelete(req.params.id);
     if (!lesson) return res.status(404).json({ message: "Lesson not found" });
-    res.status(204).send();
+    res.json({ message: "Lesson deleted" });
   }
 );
