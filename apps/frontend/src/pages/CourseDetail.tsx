@@ -1,3 +1,5 @@
+// Debugging
+console.log("API Base URL:", import.meta.env.VITE_API_BASE);
 import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
