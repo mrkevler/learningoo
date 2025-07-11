@@ -9,24 +9,31 @@ export const getCourses = asyncHandler(async (_req: Request, res: Response) => {
 });
 
 export const getCourse = asyncHandler(async (req: Request, res: Response) => {
-  const course: any = await CourseModel.findById(req.params.id)
-    .populate("categoryId", "name slug")
-    .populate("tutorId", "name authorName")
-    .lean();
+  try {
+    const course: any = await CourseModel.findById(req.params.id)
+      .populate("categoryId", "name slug")
+      .populate("tutorId", "name authorName")
+      .lean();
 
-  if (!course) {
-    return res.status(404).json({ message: "Course not found" });
+    if (!course) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+
+    // Fetch chapters (ordered) with all details for editing
+    const chapters = await ChapterModel.find({ courseId: course._id })
+      .sort({ order: 1 })
+      .select("title coverImage order _id")
+      .lean();
+
+    course.chapters = chapters;
+
+    res.json(course);
+  } catch (error) {
+    console.error("getCourse error:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: String(error) });
   }
-
-  // Fetch chapters (ordered) with all details for editing
-  const chapters = await ChapterModel.find({ courseId: course._id })
-    .sort({ order: 1 })
-    .select("title coverImage order _id")
-    .lean();
-
-  course.chapters = chapters;
-
-  res.json(course);
 });
 
 export const createCourse = asyncHandler(
@@ -162,24 +169,31 @@ export const getCourseSummaries = asyncHandler(
 
 export const getCourseBySlug = asyncHandler(
   async (req: Request, res: Response) => {
-    const slug = req.params.slug;
-    const course: any = await CourseModel.findOne({ slug })
-      .populate("categoryId", "name slug")
-      .populate("tutorId", "name authorName")
-      .lean();
+    try {
+      const slug = req.params.slug;
+      const course: any = await CourseModel.findOne({ slug })
+        .populate("categoryId", "name slug")
+        .populate("tutorId", "name authorName")
+        .lean();
 
-    if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+      if (!course) {
+        return res.status(404).json({ message: "Course not found" });
+      }
+
+      // Fetch chapters (ordered)
+      const chapters = await ChapterModel.find({ courseId: course._id })
+        .sort({ order: 1 })
+        .select("title coverImage order")
+        .lean();
+
+      (course as any).chapters = chapters;
+
+      res.json(course);
+    } catch (error) {
+      console.error("getCourseBySlug error:", error);
+      return res
+        .status(500)
+        .json({ message: "Server error", error: String(error) });
     }
-
-    // Fetch chapters (ordered)
-    const chapters = await ChapterModel.find({ courseId: course._id })
-      .sort({ order: 1 })
-      .select("title coverImage order")
-      .lean();
-
-    (course as any).chapters = chapters;
-
-    res.json(course);
   }
 );
