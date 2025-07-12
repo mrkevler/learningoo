@@ -33,25 +33,33 @@ const LessonDetailPage = () => {
     switch (block.type) {
       case "subtitle":
         return (
-          <h2 key={idx} className="text-2xl font-semibold my-4">
+          <h2
+            key={idx}
+            className="text-2xl font-semibold my-12 text-gray-900 dark:text-white"
+          >
             {block.data.text}
           </h2>
         );
       case "description":
         return (
-          <p key={idx} className="my-2 whitespace-pre-line">
+          <p
+            key={idx}
+            className="my-8 whitespace-pre-line text-gray-900 dark:text-white leading-relaxed"
+          >
             {block.data.text}
           </p>
         );
       case "code":
         return (
-          <div key={idx} className="relative my-4">
-            <pre className="bg-gray-900 p-4 rounded overflow-x-auto">
-              <code>{block.data.code}</code>
+          <div key={idx} className="relative my-12">
+            <pre className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg overflow-x-auto border border-gray-300 dark:border-gray-600">
+              <code className="text-green-600 dark:text-green-300">
+                {block.data.code}
+              </code>
             </pre>
             <button
               onClick={() => navigator.clipboard.writeText(block.data.code)}
-              className="absolute top-2 right-2 text-sm bg-gray-700 px-2 py-1 rounded hover:bg-gray-600"
+              className="absolute top-3 right-3 text-sm bg-gray-600 dark:bg-gray-600 px-3 py-2 rounded hover:bg-gray-700 dark:hover:bg-gray-500 text-white transition-colors"
             >
               Copy
             </button>
@@ -59,15 +67,16 @@ const LessonDetailPage = () => {
         );
       case "url":
         return (
-          <a
-            key={idx}
-            href={block.data.href}
-            target="_blank"
-            rel="nofollow noreferrer noopener"
-            className="text-brand underline"
-          >
-            {block.data.href}
-          </a>
+          <div key={idx} className="my-8">
+            <a
+              href={block.data.href}
+              target="_blank"
+              rel="nofollow noreferrer noopener"
+              className="text-brand underline hover:text-brand-dark"
+            >
+              {block.data.href}
+            </a>
+          </div>
         );
       case "youtube":
         const videoId = (() => {
@@ -80,7 +89,7 @@ const LessonDetailPage = () => {
           }
         })();
         return (
-          <div key={idx} className="my-4">
+          <div key={idx} className="my-16">
             <iframe
               width="560"
               height="315"
@@ -88,18 +97,19 @@ const LessonDetailPage = () => {
               title="YouTube video player"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
-              className="mx-auto w-full max-w-xl aspect-video rounded"
+              className="mx-auto w-full max-w-2xl aspect-video rounded-lg shadow-lg"
             ></iframe>
           </div>
         );
       case "image":
         return (
-          <img
-            key={idx}
-            src={block.data.src}
-            alt="lesson img"
-            className="my-4 mx-auto rounded"
-          />
+          <div key={idx} className="my-16">
+            <img
+              src={block.data.src}
+              alt="lesson img"
+              className="mx-auto rounded-lg shadow-lg max-w-full"
+            />
+          </div>
         );
       default:
         return null;
@@ -108,21 +118,23 @@ const LessonDetailPage = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto py-10">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-brand">{lesson.title}</h1>
+      <div className="container mx-auto py-16">
+        <div className="flex justify-between items-center mb-16">
+          <h1 className="text-4xl font-bold text-brand">{lesson.title}</h1>
           {isOwner && (
             <a
               href={`/lessons/${lesson._id}/edit`}
-              className="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark"
+              className="bg-brand text-white px-6 py-3 rounded-lg hover:bg-brand-dark transition-colors"
             >
               Edit Lesson
             </a>
           )}
         </div>
-        {lesson.contentBlocks?.map((block: Block, idx: number) =>
-          renderBlock(block, idx)
-        )}
+        <div className="max-w-4xl mx-auto mt-12">
+          {lesson.contentBlocks?.map((block: Block, idx: number) =>
+            renderBlock(block, idx)
+          )}
+        </div>
       </div>
     </Layout>
   );

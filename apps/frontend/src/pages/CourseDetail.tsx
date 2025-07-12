@@ -49,8 +49,8 @@ const CourseDetailPage = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto py-10 space-y-6">
-        <div className="flex justify-between items-center">
+      <div className="container mx-auto py-10">
+        <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-brand">{course.title}</h1>
           {!isOwner && !enrollmentStatus?.length && (
             <button
@@ -84,16 +84,16 @@ const CourseDetailPage = () => {
         <img
           src={course.coverImage}
           alt="cover"
-          className="w-full max-h-96 object-cover rounded"
+          className="w-full max-h-96 object-cover rounded mb-10"
         />
 
-        <p className="whitespace-pre-line text-gray-900 dark:text-white">
+        <p className="whitespace-pre-line text-gray-900 dark:text-white mb-10">
           {course.description}
         </p>
 
         {/* Photos */}
         {course.photos && course.photos.length > 0 && (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-12">
             {course.photos.map((p: string, idx: number) => (
               <img
                 key={idx}
@@ -106,8 +106,12 @@ const CourseDetailPage = () => {
         )}
 
         {/* Chapters */}
-        <section>
-          <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+        <section
+          className={
+            course.photos && course.photos.length > 0 ? "mt-12" : "mt-16"
+          }
+        >
+          <h2 className="text-2xl font-semibold mb-8 text-gray-900 dark:text-white">
             Chapters
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
