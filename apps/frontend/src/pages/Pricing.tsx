@@ -122,7 +122,7 @@ const PricingPage = () => {
                     }
                   }
                 }}
-                className={`w-full py-2 rounded ${user?.licenseId === lic._id ? "bg-gray-600" : "bg-brand hover:bg-brand-dark"}`}
+                className={`w-full py-2 rounded ${user?.licenseId === lic._id ? "bg-gray-600 text-white" : "bg-brand hover:bg-brand-dark text-white"}`}
               >
                 {user?.licenseId === lic._id ? "Your plan" : "Choose"}
               </button>

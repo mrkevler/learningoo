@@ -138,7 +138,7 @@ const ContactForm = () => {
         {/* Captcha */}
         {captcha && (
           <div className="flex items-center gap-4">
-            <span className="font-medium whitespace-nowrap">
+            <span className="font-medium whitespace-nowrap dark:text-white">
               Solve: {captcha.question}
             </span>
             <input
@@ -147,7 +147,7 @@ const ContactForm = () => {
               onChange={handleChange}
               required
               placeholder="Answer"
-              className="p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+              className="p-3 rounded-lg dark:text-white border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
             />
           </div>
         )}

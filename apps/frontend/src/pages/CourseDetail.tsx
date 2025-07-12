@@ -87,7 +87,9 @@ const CourseDetailPage = () => {
           className="w-full max-h-96 object-cover rounded"
         />
 
-        <p className="whitespace-pre-line">{course.description}</p>
+        <p className="whitespace-pre-line text-gray-900 dark:text-white">
+          {course.description}
+        </p>
 
         {/* Photos */}
         {course.photos && course.photos.length > 0 && (
@@ -105,20 +107,24 @@ const CourseDetailPage = () => {
 
         {/* Chapters */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Chapters</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+            Chapters
+          </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
             {course.chapters?.map((ch: any) => (
               <Link
                 key={ch._id}
                 to={`/chapters/${ch._id}`}
-                className="block bg-gray-800 rounded overflow-hidden hover-scale"
+                className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded overflow-hidden hover-scale"
               >
                 <img
                   src={ch.coverImage || `https://cataas.com/cat?${ch._id}`}
                   alt="chap"
                   className="h-40 w-full object-cover"
                 />
-                <div className="p-3 text-center">{ch.title}</div>
+                <div className="p-3 text-center text-gray-900 dark:text-white">
+                  {ch.title}
+                </div>
               </Link>
             ))}
           </div>
