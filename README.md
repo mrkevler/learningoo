@@ -266,108 +266,108 @@ Course
 ```
 learningoo/
 ├── apps/
-│   ├── frontend/                      # React 18 Application
+│   ├── frontend/                              # React 18 Application
 │   │   ├── src/
-│   │   │   ├── pages/                 # Route Components
-│   │   │   │   ├── HomePage.tsx       # Landing page with branding
-│   │   │   │   ├── Login.tsx          # User authentication
-│   │   │   │   ├── Register.tsx       # User registration
-│   │   │   │   ├── Profile.tsx        # User dashboard & transactions
-│   │   │   │   ├── Pricing.tsx        # License plan selection
-│   │   │   │   ├── Courses.tsx        # Course catalog with filtering
-│   │   │   │   ├── CourseDetail.tsx   # Individual course pages
-│   │   │   │   ├── ChapterDetail.tsx  # Chapter overview & lessons
-│   │   │   │   ├── LessonDetail.tsx   # Lesson content viewer
-│   │   │   │   ├── CreateCourse.tsx   # Course creation wizard
-│   │   │   │   ├── EditCourse.tsx     # Course editing interface
-│   │   │   │   ├── CreateLesson.tsx   # Drag-drop lesson builder
-│   │   │   │   ├── EditLesson.tsx     # Lesson editing interface
-│   │   │   │   ├── MyCourses.tsx      # Student/tutor course dashboard
-│   │   │   │   ├── AuthorPage.tsx     # Tutor profile pages
-│   │   │   │   ├── AuthorSetup.tsx    # Tutor profile configuration
-│   │   │   │   ├── AdminDashboard.tsx # System administration
-│   │   │   │   ├── Privacy.tsx        # Privacy policy
-│   │   │   │   └── NotFound.tsx       # 404 error page
-│   │   │   ├── components/            # Reusable UI Components
-│   │   │   │   ├── Layout.tsx         # Main app layout
-│   │   │   │   ├── Navbar.tsx         # Navigation with theme toggle
-│   │   │   │   ├── Footer.tsx         # Site footer
-│   │   │   │   ├── ContactForm.tsx    # Contact form with CAPTCHA
-│   │   │   │   ├── ProtectedRoute.tsx # Authentication guard
-│   │   │   │   ├── AdminRoute.tsx     # Admin authorization guard
-│   │   │   │   ├── Toast.tsx          # Notification system
-│   │   │   │   └── Loader.tsx         # Loading states
-│   │   │   ├── store/                 # Redux State Management
-│   │   │   │   ├── index.ts           # Store configuration
-│   │   │   │   ├── authSlice.ts       # Authentication state
-│   │   │   │   └── uiSlice.ts         # UI preferences (theme, etc.)
-│   │   │   ├── services/              # API Integration
-│   │   │   │   └── api.ts             # Axios configuration & endpoints
-│   │   │   ├── hooks/                 # Custom React Hooks
-│   │   │   │   └── useIdleLogout.ts   # Auto-logout functionality
-│   │   │   └── main.tsx               # App entry point
-│   │   ├── public/                    # Static Assets
-│   │   │   └── logo/                  # Flamingo branding assets
-│   │   └── package.json               # Frontend dependencies
+│   │   │   ├── pages/                         # Route Components
+│   │   │   │   ├── HomePage.tsx               # Landing page with branding
+│   │   │   │   ├── Login.tsx                  # User authentication
+│   │   │   │   ├── Register.tsx               # User registration
+│   │   │   │   ├── Profile.tsx                # User dashboard & transactions
+│   │   │   │   ├── Pricing.tsx                # License plan selection
+│   │   │   │   ├── Courses.tsx                # Course catalog with filtering
+│   │   │   │   ├── CourseDetail.tsx           # Individual course pages
+│   │   │   │   ├── ChapterDetail.tsx          # Chapter overview & lessons
+│   │   │   │   ├── LessonDetail.tsx           # Lesson content viewer
+│   │   │   │   ├── CreateCourse.tsx           # Course creation wizard
+│   │   │   │   ├── EditCourse.tsx             # Course editing interface
+│   │   │   │   ├── CreateLesson.tsx           # Drag-drop lesson builder
+│   │   │   │   ├── EditLesson.tsx             # Lesson editing interface
+│   │   │   │   ├── MyCourses.tsx              # Student/tutor course dashboard
+│   │   │   │   ├── AuthorPage.tsx             # Tutor profile pages
+│   │   │   │   ├── AuthorSetup.tsx            # Tutor profile configuration
+│   │   │   │   ├── AdminDashboard.tsx         # System administration
+│   │   │   │   ├── Privacy.tsx                # Privacy policy
+│   │   │   │   └── NotFound.tsx               # 404 error page
+│   │   │   ├── components/                    # Reusable UI Components
+│   │   │   │   ├── Layout.tsx                 # Main app layout
+│   │   │   │   ├── Navbar.tsx                 # Navigation with theme toggle
+│   │   │   │   ├── Footer.tsx                 # Site footer
+│   │   │   │   ├── ContactForm.tsx            # Contact form with CAPTCHA
+│   │   │   │   ├── ProtectedRoute.tsx         # Authentication guard
+│   │   │   │   ├── AdminRoute.tsx             # Admin authorization guard
+│   │   │   │   ├── Toast.tsx                  # Notification system
+│   │   │   │   └── Loader.tsx                 # Loading states
+│   │   │   ├── store/                         # Redux State Management
+│   │   │   │   ├── index.ts                   # Store configuration
+│   │   │   │   ├── authSlice.ts               # Authentication state
+│   │   │   │   └── uiSlice.ts                 # UI preferences
+│   │   │   ├── services/                      # API Integration
+│   │   │   │   └── api.ts                     # Axios configuration & endpoints
+│   │   │   ├── hooks/                         # Custom React Hooks
+│   │   │   │   └── useIdleLogout.ts           # Auto-logout functionality
+│   │   │   └── main.tsx                       # App entry point
+│   │   ├── public/                            # Static Assets
+│   │   │   └── logo/                          # Branding assets
+│   │   └── package.json                       # Frontend dependencies
 │   │
-│   └── backend/                       # Express.js API Server
+│   └── backend/                               # Express.js API Server
 │       ├── src/
-│       │   ├── models/                # MongoDB Schemas
-│       │   │   ├── user.model.ts      # User accounts & authentication
-│       │   │   ├── course.model.ts    # Course metadata & structure
-│       │   │   ├── chapter.model.ts   # Course chapters
-│       │   │   ├── lesson.model.ts    # Lesson content & blocks
-│       │   │   ├── category.model.ts  # Course categorization
-│       │   │   ├── license.model.ts   # Subscription plans
-│       │   │   ├── enrollment.model.ts# Student-course relationships
-│       │   │   ├── transaction.model.ts# Financial transaction log
-│       │   │   └── config.model.ts    # System configuration
-│       │   ├── controllers/           # Request Handlers
-│       │   │   ├── auth.controller.ts # Login/register logic
-│       │   │   ├── user.controller.ts # User CRUD operations
-│       │   │   ├── course.controller.ts# Course management
-│       │   │   ├── chapter.controller.ts# Chapter operations
-│       │   │   ├── lesson.controller.ts# Lesson CRUD & content
-│       │   │   ├── category.controller.ts# Category management
-│       │   │   ├── license.controller.ts# Subscription handling
-│       │   │   ├── enrollment.controller.ts# Course enrollment
-│       │   │   ├── transaction.controller.ts# Payment processing
-│       │   │   ├── contact.controller.ts# Contact form handling
-│       │   │   └── admin.controller.ts# Administrative functions
-│       │   ├── routes/                # API Route Definitions
-│       │   │   ├── index.ts           # Route aggregation
-│       │   │   ├── auth.routes.ts     # Authentication endpoints
-│       │   │   ├── user.routes.ts     # User endpoints
-│       │   │   ├── course.routes.ts   # Course endpoints
-│       │   │   ├── chapter.routes.ts  # Chapter endpoints
-│       │   │   ├── lesson.routes.ts   # Lesson endpoints
-│       │   │   ├── category.routes.ts # Category endpoints
-│       │   │   ├── license.routes.ts  # License endpoints
-│       │   │   ├── enrollment.routes.ts# Enrollment endpoints
-│       │   │   ├── transaction.routes.ts# Transaction endpoints
-│       │   │   ├── contact.routes.ts  # Contact form endpoints
-│       │   │   └── admin.routes.ts    # Admin-only endpoints
-│       │   ├── utils/                 # Helper Functions
-│       │   │   ├── asyncHandler.ts    # Error handling wrapper
-│       │   │   ├── adminAuth.ts       # Admin authorization
-│       │   │   ├── captcha.ts         # CAPTCHA generation
-│       │   │   ├── email.ts           # Email service integration
-│       │   │   ├── rateLimiter.ts     # Rate limiting for forms
-│       │   │   └── getConfig.ts       # Configuration management
-│       │   ├── config/                # Configuration
-│       │   │   └── db.ts              # MongoDB connection
-│       │   └── index.ts               # Server entry point
-│       └── package.json               # Backend dependencies
+│       │   ├── models/                        # MongoDB Schemas
+│       │   │   ├── user.model.ts              # User accounts & authentication
+│       │   │   ├── course.model.ts            # Course metadata & structure
+│       │   │   ├── chapter.model.ts           # Course chapters
+│       │   │   ├── lesson.model.ts            # Lesson content & blocks
+│       │   │   ├── category.model.ts          # Course categorization
+│       │   │   ├── license.model.ts           # Subscription plans
+│       │   │   ├── enrollment.model.ts        # Student-course relationships
+│       │   │   ├── transaction.model.ts       # Financial transaction log
+│       │   │   └── config.model.ts            # System configuration
+│       │   ├── controllers/                   # Request Handlers
+│       │   │   ├── auth.controller.ts         # Login/register logic
+│       │   │   ├── user.controller.ts         # User CRUD operations
+│       │   │   ├── course.controller.ts       # Course management
+│       │   │   ├── chapter.controller.ts      # Chapter operations
+│       │   │   ├── lesson.controller.ts       # Lesson CRUD & content
+│       │   │   ├── category.controller.ts     # Category management
+│       │   │   ├── license.controller.ts      # Subscription handling
+│       │   │   ├── enrollment.controller.ts   # Course enrollment
+│       │   │   ├── transaction.controller.ts  # Payment processing
+│       │   │   ├── contact.controller.ts      # Contact form handling
+│       │   │   └── admin.controller.ts        # Administrative functions
+│       │   ├── routes/                        # API Route Definitions
+│       │   │   ├── index.ts                   # Route aggregation
+│       │   │   ├── auth.routes.ts             # Authentication endpoints
+│       │   │   ├── user.routes.ts             # User endpoints
+│       │   │   ├── course.routes.ts           # Course endpoints
+│       │   │   ├── chapter.routes.ts          # Chapter endpoints
+│       │   │   ├── lesson.routes.ts           # Lesson endpoints
+│       │   │   ├── category.routes.ts         # Category endpoints
+│       │   │   ├── license.routes.ts          # License endpoints
+│       │   │   ├── enrollment.routes.ts       # Enrollment endpoints
+│       │   │   ├── transaction.routes.ts      # Transaction endpoints
+│       │   │   ├── contact.routes.ts          # Contact form endpoints
+│       │   │   └── admin.routes.ts            # Admin-only endpoints
+│       │   ├── utils/                         # Helper Functions
+│       │   │   ├── asyncHandler.ts            # Error handling wrapper
+│       │   │   ├── adminAuth.ts               # Admin authorization
+│       │   │   ├── captcha.ts                 # CAPTCHA generation
+│       │   │   ├── email.ts                   # Email service integration
+│       │   │   ├── rateLimiter.ts             # Rate limiting for forms
+│       │   │   └── getConfig.ts               # Configuration management
+│       │   ├── config/                        # Configuration
+│       │   │   └── db.ts                      # MongoDB connection
+│       │   └── index.ts                       # Server entry point
+│       └── package.json                       # Backend dependencies
 │
 ├── packages/
-│   └── shared/                        # Shared TypeScript Types
+│   └── shared/                                # Shared TypeScript Types
 │       ├── src/types/
-│       │   └── index.ts               # Common interfaces
+│       │   └── index.ts                       # Common interfaces
 │       └── package.json
 │
-├── docker-compose.yml                 # Multi-container setup
-├── Dockerfile                         # Container configuration
-└── package.json                       # Root workspace configuration
+├── docker-compose.yml                         # Multi-container setup
+├── Dockerfile                                 # Container configuration
+└── package.json                               # Root workspace configuration
 ```
 
 ---
