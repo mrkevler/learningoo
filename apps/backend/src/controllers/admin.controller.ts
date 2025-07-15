@@ -103,7 +103,7 @@ export const getSystemOverview = asyncHandler(
         CourseModel.countDocuments(),
       ]);
 
-    // license breakdown counts number of users with license slug
+    // license breakdown - count number of users with license slug
     const licenseCountsAgg = await UserModel.aggregate([
       {
         $lookup: {
@@ -149,7 +149,7 @@ export const getSystemOverview = asyncHandler(
       if (r._id === "course") revenueCourses = r.total;
     }
 
-    // top earner (sum of credit by userId)
+    // top earner - sum of credit by userId
     const topEarnerAgg = await TransactionModel.aggregate([
       { $group: { _id: "$userId", total: { $sum: "$amount" } } },
       { $sort: { total: -1 } },

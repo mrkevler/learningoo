@@ -71,7 +71,7 @@ app.use("/api", routes);
       {
         name: "Startup",
         slug: "startup",
-        price: 0,
+        price: 9,
         courseLimit: 5,
         chapterLimit: null,
         lessonLimit: null,
@@ -79,7 +79,7 @@ app.use("/api", routes);
       {
         name: "Advanced",
         slug: "advanced",
-        price: 0,
+        price: 16,
         courseLimit: 10,
         chapterLimit: null,
         lessonLimit: null,
@@ -87,7 +87,7 @@ app.use("/api", routes);
       {
         name: "Professional",
         slug: "pro",
-        price: 0,
+        price: 29,
         courseLimit: null,
         chapterLimit: null,
         lessonLimit: null,

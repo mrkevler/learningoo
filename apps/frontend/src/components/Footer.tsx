@@ -1,4 +1,4 @@
-// import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom"; // TODO: add link to home page
 
 const Footer = () => {
   return (

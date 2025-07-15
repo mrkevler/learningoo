@@ -12,7 +12,7 @@ COPY apps/backend/package*.json ./apps/backend/
 COPY apps/frontend/package*.json ./apps/frontend/
 COPY packages/shared/package*.json ./packages/shared/
 
-# Install dependencies (will use npm workspaces)
+# Install dependencies
 RUN npm ci --legacy-peer-deps
 
 # Copy the rest of the source code

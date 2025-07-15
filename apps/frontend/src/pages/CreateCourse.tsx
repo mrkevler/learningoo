@@ -28,7 +28,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-// Helper to fetch a landscape cat image (roughly 16:9). Later replace with real upload.
+// Fetch landscape cat image in 800x450px 16:9 ratio
 const catLandscape = () =>
   `https://cataas.com/cat?width=800&height=450&rand=${Math.random()}`;
 
@@ -301,7 +301,7 @@ const CreateCoursePage = () => {
             </p>
             <p className="mb-3 italic text-brand-dark">
               {`Welcome {userName} on the course: ${getValues("title") || "<course title>"}`}
-              {/* add domain name to the beginning of the relative path and change logic to sending emails in production ;) */}
+              {/* add domain name to the beginning of the relative path and change logic to send emails in production ;) */}
             </p>
             <label className="block mb-1 text-gray-800 dark:text-gray-100">
               Welcome Message Body

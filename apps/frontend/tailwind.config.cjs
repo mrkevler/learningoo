@@ -11,7 +11,7 @@ module.exports = {
         },
         /* Accent Colors */
         accent: {
-          DEFAULT: "#ff0099", // primary accent (magenta)
+          DEFAULT: "#ff0099", // primary accent
           pink: "#ff0099",
           purple: "#8b5cf6",
           green: "#10b981",

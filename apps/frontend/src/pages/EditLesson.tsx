@@ -187,7 +187,7 @@ const EditLessonPage = () => {
     clone.style.transform = "scale(1.05)";
     clone.style.transition = "transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)";
 
-    // Advanced shadow system for realistic depth
+    // Shadow system
     clone.style.filter = `
       drop-shadow(0 20px 25px rgba(0, 0, 0, 0.4))
       drop-shadow(0 8px 10px rgba(0, 0, 0, 0.3))
@@ -228,7 +228,7 @@ const EditLessonPage = () => {
         clone.style.left = `${newX}px`;
         clone.style.top = `${newY}px`;
 
-        // Keep steady 5% scale increase - no rotation
+        // Keep steady 5% scale increase
         clone.style.transform = `scale(1.05) translateZ(0)`;
       }
 
@@ -640,7 +640,7 @@ const EditLessonPage = () => {
             ))}
           </div>
 
-          {/* Block palette - moved below blocks editor for better UX */}
+          {/* Block palette */}
           <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="w-full mb-2">
               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">

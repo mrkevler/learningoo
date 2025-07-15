@@ -29,7 +29,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-// Helper to fetch a landscape cat image (roughly 16:9). Later replace with real upload.
+// Fetch a landscape cat image 800x450px 16:9 ratio
 const catLandscape = () =>
   `https://cataas.com/cat?width=800&height=450&rand=${Math.random()}`;
 
@@ -130,7 +130,7 @@ const EditCoursePage = () => {
     mutation.mutate(payload);
   };
 
-  // Scroll to first error on submit failure
+  // Scroll to first error on submit fail
   const {
     trigger,
     formState: { errors: formErrors, submitCount },

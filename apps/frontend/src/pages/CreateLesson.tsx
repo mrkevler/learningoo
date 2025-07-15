@@ -51,12 +51,12 @@ const CreateLessonPage = () => {
   const queryClient = useQueryClient();
   const blocksContainerRef = useRef<HTMLDivElement>(null);
 
-  // Robust conversion to string - handle objects, arrays, etc.
+  // Conversion to string - handle objects and arrays (later)
   const chapterIdString = (() => {
     if (!chapterId) return undefined;
     if (typeof chapterId === "string") return chapterId;
     if (typeof chapterId === "object") {
-      // If it's an object, try to extract _id or id field
+      // If it's an object try to extract _id or id field
       if ("_id" in chapterId) return String((chapterId as any)._id);
       if ("id" in chapterId) return String((chapterId as any).id);
       // Otherwise convert the whole object to string
@@ -73,7 +73,7 @@ const CreateLessonPage = () => {
     chapterIdString !== "undefined" &&
     chapterIdString !== "null";
 
-  // Fetch chapter to display context & compute next order
+  // Fetch chapter to display context and compute next order
   const { data: chapter, error: chapterError } = useQuery({
     enabled: !!isValidChapterId,
     queryKey: ["chapter", chapterIdString],
@@ -206,7 +206,7 @@ const CreateLessonPage = () => {
     clone.style.border = "2px solid rgba(236, 72, 153, 0.3)";
     clone.style.borderRadius = "12px";
 
-    // Add subtle glow
+    // Add glow
     clone.style.boxShadow = `
       0 0 0 1px rgba(236, 72, 153, 0.2),
       0 0 20px rgba(236, 72, 153, 0.15),
@@ -233,7 +233,7 @@ const CreateLessonPage = () => {
         clone.style.left = `${newX}px`;
         clone.style.top = `${newY}px`;
 
-        // Keep steady 5% scale increase - no rotation
+        // Keep steady 5% scale increase (consider feat: rotate around 0.5 degrees)
         clone.style.transform = `scale(1.05) translateZ(0)`;
       }
 
@@ -268,18 +268,18 @@ const CreateLessonPage = () => {
         const overlapTop = Math.max(draggedRect.top, targetRect.top);
         const overlapBottom = Math.min(draggedRect.bottom, targetRect.bottom);
 
-        // Check if there's actual overlap
+        // Check for actual overlap
         if (overlapLeft < overlapRight && overlapTop < overlapBottom) {
           const overlapWidth = overlapRight - overlapLeft;
           const overlapHeight = overlapBottom - overlapTop;
           const overlapArea = overlapWidth * overlapHeight;
 
-          // Calculate percentage of target element that's overlapped
+          // Calculate percentage of target element that is overlapped
           const targetArea = targetRect.width * targetRect.height;
           const overlapPercentage = overlapArea / targetArea;
 
-          // Only consider significant overlaps (more than 30% of target)
-          if (overlapPercentage > 0.3 && overlapArea > maxOverlap) {
+          // Only consider significant overlaps (more than 40% of target)
+          if (overlapPercentage > 0.4 && overlapArea > maxOverlap) {
             maxOverlap = overlapArea;
             bestIndex = targetIndex;
 
@@ -290,13 +290,13 @@ const CreateLessonPage = () => {
           }
         }
 
-        // Also check for proximity-based detection (when not overlapping)
+        // Also check for closeness-based detection when not overlapping
         if (maxOverlap === 0) {
           const draggedCenterY = draggedRect.top + draggedRect.height / 2;
           const targetCenterY = targetRect.top + targetRect.height / 2;
           const distance = Math.abs(draggedCenterY - targetCenterY);
 
-          // Extended detection zone (within 80px of target center)
+          // Detection zone within 80px of target center
           if (distance < 80) {
             const proximityScore = 80 - distance;
             if (proximityScore > maxOverlap) {
@@ -336,7 +336,7 @@ const CreateLessonPage = () => {
         }
       }
 
-      // Cleanup with smooth animation
+      // Cleanup with animation
       if (clone) {
         clone.style.transition = "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)";
         clone.style.transform = "scale(1.0)";
@@ -405,11 +405,11 @@ const CreateLessonPage = () => {
             className="w-full px-3 py-2 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-brand"
           />
 
-          {/* Blocks editor - moved before block palette */}
+          {/* Blocks editor */}
           <div ref={blocksContainerRef} className="space-y-4">
             {blocks.map((block, idx) => (
               <div key={block.id} className="relative">
-                {/* Enhanced drop indicator above */}
+                {/* Drop indicator above */}
                 {dragOverIndex === idx &&
                   dragOverPosition === "above" &&
                   isDragging &&
@@ -600,7 +600,7 @@ const CreateLessonPage = () => {
                   )}
                 </div>
 
-                {/* Enhanced drop indicator below */}
+                {/* Drop indicator below */}
                 {dragOverIndex === idx &&
                   dragOverPosition === "below" &&
                   isDragging &&
@@ -642,7 +642,7 @@ const CreateLessonPage = () => {
             ))}
           </div>
 
-          {/* Block palette - moved below blocks editor for better UX */}
+          {/* Block palette */}
           <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div className="w-full mb-2">
               <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
