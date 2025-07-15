@@ -1,0 +1,2692 @@
+openapi: 3.0.0
+info:
+  title: Learningoo API
+  description: Complete API documentation for Learningoo - Online Learning Platform
+  version: 1.0.0
+  contact:
+    name: Learningoo Support
+    email: support@learningoo.dev
+
+servers:
+  - url: http://localhost:4000/api
+    description: Development server
+  - url: https://api.learningoo.com/api
+    description: Production server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # === USER SCHEMAS ===
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [student, tutor, admin]
+        balance:
+          type: number
+          default: 100
+        isActive:
+          type: boolean
+          default: true
+        authorName:
+          type: string
+        authorBio:
+          type: string
+        authorWebsite:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UserRegistration:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          minLength: 2
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    # === COURSE SCHEMAS ===
+    Course:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        coverImage:
+          type: string
+        photos:
+          type: array
+          items:
+            type: string
+        price:
+          type: number
+          minimum: 0
+        category:
+          type: string
+          description: Category ID reference
+        author:
+          type: string
+          description: User ID reference
+        chapters:
+          type: array
+          items:
+            type: string
+            description: Chapter ID references
+        enrollments:
+          type: array
+          items:
+            type: string
+            description: Enrollment ID references
+        welcomeEmail:
+          type: object
+          properties:
+            subject:
+              type: string
+            body:
+              type: string
+        isPublished:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CourseCreate:
+      type: object
+      required:
+        - title
+        - description
+        - category
+        - price
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        coverImage:
+          type: string
+        photos:
+          type: array
+          items:
+            type: string
+        price:
+          type: number
+          minimum: 0
+        category:
+          type: string
+        welcomeEmail:
+          type: object
+          properties:
+            subject:
+              type: string
+            body:
+              type: string
+
+    # === CHAPTER SCHEMAS ===
+    Chapter:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        coverImage:
+          type: string
+        course:
+          type: string
+          description: Course ID reference
+        lessons:
+          type: array
+          items:
+            type: string
+            description: Lesson ID references
+        order:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ChapterCreate:
+      type: object
+      required:
+        - title
+        - course
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        coverImage:
+          type: string
+        course:
+          type: string
+        order:
+          type: number
+
+    # === LESSON SCHEMAS ===
+    ContentBlock:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [text, subtitle, code, url, youtube, image]
+        content:
+          type: string
+        language:
+          type: string
+          description: For code blocks
+        order:
+          type: number
+
+    Lesson:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+        chapter:
+          type: string
+          description: Chapter ID reference
+        contentBlocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContentBlock"
+        order:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    LessonCreate:
+      type: object
+      required:
+        - title
+        - chapter
+      properties:
+        title:
+          type: string
+        chapter:
+          type: string
+        contentBlocks:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContentBlock"
+        order:
+          type: number
+
+    # === CATEGORY SCHEMAS ===
+    Category:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CategoryCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+
+    # === LICENSE SCHEMAS ===
+    License:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+          enum: [free, startup, advanced, professional]
+        price:
+          type: number
+        maxCourses:
+          type: number
+        maxChaptersPerCourse:
+          type: number
+        maxLessonsPerChapter:
+          type: number
+        features:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # === ENROLLMENT SCHEMAS ===
+    Enrollment:
+      type: object
+      properties:
+        _id:
+          type: string
+        student:
+          type: string
+          description: User ID reference
+        course:
+          type: string
+          description: Course ID reference
+        enrolledAt:
+          type: string
+          format: date-time
+        completedLessons:
+          type: array
+          items:
+            type: string
+            description: Lesson ID references
+        progress:
+          type: number
+          minimum: 0
+          maximum: 100
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # === TRANSACTION SCHEMAS ===
+    Transaction:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: string
+          description: User ID reference
+        type:
+          type: string
+          enum: [credit, debit]
+        amount:
+          type: number
+        description:
+          type: string
+        relatedCourse:
+          type: string
+          description: Course ID reference (optional)
+        balance:
+          type: number
+          description: Balance after transaction
+        createdAt:
+          type: string
+          format: date-time
+
+    # === CONTACT SCHEMAS ===
+    ContactMessage:
+      type: object
+      required:
+        - name
+        - email
+        - message
+        - captchaAnswer
+        - captchaId
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        message:
+          type: string
+        captchaAnswer:
+          type: string
+        captchaId:
+          type: string
+        honeypot:
+          type: string
+          description: Should be empty (spam protection)
+
+    # === ADMIN SCHEMAS ===
+    AdminLogin:
+      type: object
+      required:
+        - email
+        - kvlr
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        kvlr:
+          type: string
+          description: Admin verification key
+        password:
+          type: string
+
+    SystemConfig:
+      type: object
+      properties:
+        registrationEnabled:
+          type: boolean
+        loginEnabled:
+          type: boolean
+        defaultUserCredits:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SystemOverview:
+      type: object
+      properties:
+        totalUsers:
+          type: number
+        totalStudents:
+          type: number
+        totalTutors:
+          type: number
+        totalCourses:
+          type: number
+        totalCategories:
+          type: number
+        licenseDistribution:
+          type: object
+          additionalProperties:
+            type: number
+        topTutors:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+              name:
+                type: string
+              earnings:
+                type: number
+
+    # === COMMON SCHEMAS ===
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+
+    Success:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    Captcha:
+      type: object
+      properties:
+        id:
+          type: string
+        question:
+          type: string
+
+# === API ENDPOINTS ===
+paths:
+  # === AUTHENTICATION ENDPOINTS ===
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: >
+        Registers a new user account. Returns a JWT token and user details on success.
+        Email must be unique. Password must be at least 6 characters.
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistration"
+            example:
+              name: "Alice"
+              email: "alice@example.com"
+              password: "secret123"
+      responses:
+        201:
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+              example:
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                user:
+                  _id: "abc123"
+                  name: "Alice"
+                  email: "alice@example.com"
+                  role: "student"
+        400:
+          description: Validation error or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Email already exists"
+        422:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Missing required field: email"
+      security: []
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: >
+        Authenticates a user and returns a JWT token along with user details.
+        Use the token in the Authorization header for subsequent requests.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+            example:
+              email: "user@example.com"
+              password: "password123"
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+              example:
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                user:
+                  _id: "abc123"
+                  name: "Alice"
+                  email: "alice@example.com"
+                  role: "student"
+        401:
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid email or password"
+        422:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Missing required field: email"
+      security: []
+
+  # === USER ENDPOINTS ===
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      description: >
+        Returns a list of all registered users. Requires authentication (JWT).
+      operationId: getAllUsers
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+              example:
+                - _id: "abc123"
+                  name: "Alice"
+                  email: "alice@example.com"
+                  role: "student"
+                - _id: "def456"
+                  name: "Bob"
+                  email: "bob@example.com"
+                  role: "tutor"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: >
+        Returns details for a specific user by their unique ID. Requires authentication (JWT).
+      operationId: getUserById
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the user.
+          example: "abc123"
+      responses:
+        200:
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+              example:
+                _id: "abc123"
+                name: "Alice"
+                email: "alice@example.com"
+                role: "student"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "User not found"
+
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: >
+        Updates user profile information. Only the user themselves or an admin can update a user. Requires authentication (JWT).
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the user.
+          example: "abc123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The user's display name.
+                  example: "Alice Smith"
+                authorName:
+                  type: string
+                  description: The user's author name (if tutor).
+                  example: "Prof. Alice"
+                authorBio:
+                  type: string
+                  description: The user's biography (if tutor).
+                  example: "Expert in productivity."
+                authorWebsite:
+                  type: string
+                  description: The user's website (if tutor).
+                  example: "https://alice.dev"
+      responses:
+        200:
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+              example:
+                _id: "abc123"
+                name: "Alice Smith"
+                email: "alice@example.com"
+                role: "student"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to update)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to update this user"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "User not found"
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: >
+        Deletes a user by their unique ID. Only the user themselves or an admin can delete a user. Requires authentication (JWT).
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the user.
+          example: "abc123"
+      responses:
+        204:
+          description: User deleted successfully (no content)
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to delete)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to delete this user"
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "User not found"
+
+  # === COURSE ENDPOINTS ===
+  /courses:
+    get:
+      tags:
+        - Courses
+      summary: List all courses
+      description: >
+        Returns a list of all published courses. Supports optional filtering by category or author via query parameters. Public endpoint.
+      operationId: listCourses
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          required: false
+          description: Filter courses by category ID.
+          example: "cat123"
+        - in: query
+          name: author
+          schema:
+            type: string
+          required: false
+          description: Filter courses by author (user) ID.
+          example: "user456"
+      responses:
+        200:
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+              example:
+                - _id: "course1"
+                  title: "Productivity Mastery"
+                  slug: "productivity-mastery"
+                  description: "Boost your productivity."
+                  price: 49.99
+                  category: "cat123"
+                  author: "user456"
+                  isPublished: true
+                - _id: "course2"
+                  title: "Time Management"
+                  slug: "time-management"
+                  description: "Master your time."
+                  price: 29.99
+                  category: "cat123"
+                  author: "user789"
+                  isPublished: true
+        400:
+          description: Invalid query parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid category ID"
+
+    post:
+      tags:
+        - Courses
+      summary: Create a new course
+      description: >
+        Creates a new course. Only authenticated users with the 'tutor' or 'admin' role can create courses. Requires authentication (JWT).
+      operationId: createCourse
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseCreate"
+            example:
+              title: "Productivity Mastery"
+              description: "Boost your productivity."
+              price: 49.99
+              category: "cat123"
+              coverImage: "https://cdn.learningoo.com/covers/prod-mastery.png"
+      responses:
+        201:
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+              example:
+                _id: "course1"
+                title: "Productivity Mastery"
+                slug: "productivity-mastery"
+                description: "Boost your productivity."
+                price: 49.99
+                category: "cat123"
+                author: "user456"
+                isPublished: false
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Missing required field: title"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to create)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to create courses"
+
+  /courses/summary:
+    get:
+      tags:
+        - Courses
+      summary: Get course summaries for catalog
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        200:
+          description: Course summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                    title:
+                      type: string
+                    slug:
+                      type: string
+                    description:
+                      type: string
+                    coverImage:
+                      type: string
+                    price:
+                      type: number
+                    author:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        authorName:
+                          type: string
+
+  /courses/{id}:
+    get:
+      tags:
+        - Courses
+      summary: Get course details
+      description: >
+        Returns detailed information for a specific course by its unique ID. Public endpoint.
+      operationId: getCourseById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the course.
+          example: "course1"
+      responses:
+        200:
+          description: Course found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+              example:
+                _id: "course1"
+                title: "Productivity Mastery"
+                slug: "productivity-mastery"
+                description: "Boost your productivity."
+                price: 49.99
+                category: "cat123"
+                author: "user456"
+                isPublished: true
+        400:
+          description: Invalid course ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid course ID"
+        404:
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Course not found"
+
+    put:
+      tags:
+        - Courses
+      summary: Update course (Author only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseCreate"
+      responses:
+        200:
+          description: Course updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        403:
+          description: Not course author
+
+    delete:
+      tags:
+        - Courses
+      summary: Delete course (Author only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Course deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  /courses/slug/{slug}:
+    get:
+      tags:
+        - Courses
+      summary: Get course by slug
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Course details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        404:
+          description: Course not found
+
+  /courses/{id}/enroll:
+    post:
+      tags:
+        - Courses
+      summary: Enroll in a course
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Enrollment successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  enrollment:
+                    $ref: "#/components/schemas/Enrollment"
+        400:
+          description: Already enrolled or insufficient balance
+
+  # === CHAPTER ENDPOINTS ===
+  /chapters:
+    get:
+      tags:
+        - Chapters
+      summary: List all chapters
+      description: >
+        Returns a list of all chapters. Optionally filter by course ID. Public endpoint.
+      operationId: listChapters
+      parameters:
+        - in: query
+          name: course
+          schema:
+            type: string
+          required: false
+          description: Filter chapters by course ID.
+          example: "course1"
+      responses:
+        200:
+          description: List of chapters
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Chapter"
+              example:
+                - _id: "chap1"
+                  title: "Introduction"
+                  course: "course1"
+                  order: 1
+                - _id: "chap2"
+                  title: "Advanced Topics"
+                  course: "course1"
+                  order: 2
+
+    post:
+      tags:
+        - Chapters
+      summary: Create a new chapter
+      description: >
+        Creates a new chapter for a course. Only tutors or admins can create chapters. Requires authentication (JWT).
+      operationId: createChapter
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChapterCreate"
+            example:
+              title: "New Chapter"
+              course: "course1"
+              order: 3
+      responses:
+        201:
+          description: Chapter created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chapter"
+              example:
+                _id: "chap3"
+                title: "New Chapter"
+                course: "course1"
+                order: 3
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to create)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to create chapters"
+        404:
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Course not found"
+
+  /chapters/{id}:
+    get:
+      tags:
+        - Chapters
+      summary: Get chapter with lessons
+      description: >
+        Returns a chapter and its lessons by chapter ID. Public endpoint.
+      operationId: getChapterById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the chapter.
+          example: "chap1"
+      responses:
+        200:
+          description: Chapter with lessons
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Chapter"
+                  - type: object
+                    properties:
+                      lessons:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Lesson"
+              example:
+                _id: "chap1"
+                title: "Introduction"
+                course: "course1"
+                order: 1
+                lessons:
+                  - _id: "lesson1"
+                    title: "Welcome"
+                  - _id: "lesson2"
+                    title: "Getting Started"
+        404:
+          description: Chapter not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Chapter not found"
+
+    put:
+      tags:
+        - Chapters
+      summary: Update chapter
+      description: >
+        Updates a chapter. Only tutors or admins can update chapters. Requires authentication (JWT).
+      operationId: updateChapter
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the chapter.
+          example: "chap1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChapterCreate"
+            example:
+              title: "Updated Chapter"
+              course: "course1"
+              order: 1
+      responses:
+        200:
+          description: Chapter updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chapter"
+              example:
+                _id: "chap1"
+                title: "Updated Chapter"
+                course: "course1"
+                order: 1
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to update)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to update chapter"
+        404:
+          description: Chapter not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Chapter not found"
+
+    delete:
+      tags:
+        - Chapters
+      summary: Delete chapter
+      description: >
+        Deletes a chapter. Only tutors or admins can delete chapters. Requires authentication (JWT).
+      operationId: deleteChapter
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the chapter.
+          example: "chap1"
+      responses:
+        204:
+          description: Chapter deleted successfully (no content)
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to delete)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to delete chapter"
+        404:
+          description: Chapter not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Chapter not found"
+
+  # === LESSON ENDPOINTS ===
+  /lessons:
+    get:
+      tags:
+        - Lessons
+      summary: List all lessons
+      description: >
+        Returns a list of all lessons. Optionally filter by chapter ID. Public endpoint.
+      operationId: listLessons
+      parameters:
+        - in: query
+          name: chapter
+          schema:
+            type: string
+          required: false
+          description: Filter lessons by chapter ID.
+          example: "chap1"
+      responses:
+        200:
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lesson"
+              example:
+                - _id: "lesson1"
+                  title: "Welcome"
+                  chapter: "chap1"
+                  order: 1
+                - _id: "lesson2"
+                  title: "Getting Started"
+                  chapter: "chap1"
+                  order: 2
+
+    post:
+      tags:
+        - Lessons
+      summary: Create a new lesson
+      description: >
+        Creates a new lesson for a chapter. Only tutors or admins can create lessons. Requires authentication (JWT).
+      operationId: createLesson
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonCreate"
+            example:
+              title: "New Lesson"
+              chapter: "chap1"
+              order: 3
+      responses:
+        201:
+          description: Lesson created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+              example:
+                _id: "lesson3"
+                title: "New Lesson"
+                chapter: "chap1"
+                order: 3
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to create)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to create lessons"
+        404:
+          description: Chapter not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Chapter not found"
+
+  /lessons/{id}:
+    get:
+      tags:
+        - Lessons
+      summary: Get lesson with content blocks
+      description: >
+        Returns a lesson and its content blocks by lesson ID. Public endpoint.
+      operationId: getLessonById
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the lesson.
+          example: "lesson1"
+      responses:
+        200:
+          description: Lesson details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+              example:
+                _id: "lesson1"
+                title: "Welcome"
+                chapter: "chap1"
+                order: 1
+                contentBlocks:
+                  - type: "text"
+                    content: "Welcome to the course!"
+                  - type: "code"
+                    content: "console.log('Hello!')"
+                    language: "javascript"
+        404:
+          description: Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Lesson not found"
+
+    put:
+      tags:
+        - Lessons
+      summary: Update lesson content
+      description: >
+        Updates a lesson. Only tutors or admins can update lessons. Requires authentication (JWT).
+      operationId: updateLesson
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the lesson.
+          example: "lesson1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonCreate"
+            example:
+              title: "Updated Lesson"
+              chapter: "chap1"
+              order: 1
+      responses:
+        200:
+          description: Lesson updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+              example:
+                _id: "lesson1"
+                title: "Updated Lesson"
+                chapter: "chap1"
+                order: 1
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to update)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to update lesson"
+        404:
+          description: Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Lesson not found"
+
+    delete:
+      tags:
+        - Lessons
+      summary: Delete lesson
+      description: >
+        Deletes a lesson. Only tutors or admins can delete lessons. Requires authentication (JWT).
+      operationId: deleteLesson
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the lesson.
+          example: "lesson1"
+      responses:
+        204:
+          description: Lesson deleted successfully (no content)
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to delete)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to delete lesson"
+        404:
+          description: Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Lesson not found"
+
+  # === CATEGORY ENDPOINTS ===
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: List all categories
+      description: >
+        Returns a list of all course categories. Public endpoint.
+      operationId: listCategories
+      responses:
+        200:
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+              example:
+                - _id: "cat123"
+                  name: "Productivity"
+                  slug: "productivity"
+                  description: "Courses to boost productivity."
+                - _id: "cat456"
+                  name: "Programming"
+                  slug: "programming"
+                  description: "Learn to code."
+
+    post:
+      tags:
+        - Categories
+      summary: Create a new category
+      description: >
+        Creates a new course category. Only admins can create categories. Requires admin authentication (JWT).
+      operationId: createCategory
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreate"
+            example:
+              name: "Design"
+              description: "Courses about design."
+      responses:
+        201:
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+              example:
+                _id: "cat789"
+                name: "Design"
+                slug: "design"
+                description: "Courses about design."
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+
+  /categories/{id}:
+    put:
+      tags:
+        - Categories
+      summary: Update category
+      description: >
+        Updates a course category. Only admins can update categories. Requires admin authentication (JWT).
+      operationId: updateCategory
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the category.
+          example: "cat123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreate"
+            example:
+              name: "Updated Category"
+              description: "Updated description."
+      responses:
+        200:
+          description: Category updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+              example:
+                _id: "cat123"
+                name: "Updated Category"
+                slug: "updated-category"
+                description: "Updated description."
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+        404:
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Category not found"
+
+    delete:
+      tags:
+        - Categories
+      summary: Delete category
+      description: >
+        Deletes a course category. Only admins can delete categories. Requires admin authentication (JWT).
+      operationId: deleteCategory
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the category.
+          example: "cat123"
+      responses:
+        204:
+          description: Category deleted successfully (no content)
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+        404:
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Category not found"
+
+  # === LICENSE ENDPOINTS ===
+  /licenses:
+    get:
+      tags:
+        - Licenses
+      summary: List all license plans
+      description: >
+        Returns a list of all available license plans. Public endpoint.
+      operationId: listLicenses
+      responses:
+        200:
+          description: List of license plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/License"
+              example:
+                - _id: "lic1"
+                  name: "free"
+                  price: 0
+                  maxCourses: 1
+                  maxChaptersPerCourse: 2
+                  maxLessonsPerChapter: 5
+                  features: ["Basic access"]
+                - _id: "lic2"
+                  name: "startup"
+                  price: 10
+                  maxCourses: 5
+                  maxChaptersPerCourse: 10
+                  maxLessonsPerChapter: 20
+                  features: ["All free features", "Priority support"]
+
+  /licenses/assign:
+    post:
+      tags:
+        - Licenses
+      summary: Assign license to user
+      description: >
+        Assigns a license plan to a user. Only admins can assign licenses. Requires admin authentication (JWT).
+      operationId: assignLicense
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - licenseId
+              properties:
+                userId:
+                  type: string
+                  description: The unique identifier of the user.
+                  example: "abc123"
+                licenseId:
+                  type: string
+                  description: The unique identifier of the license.
+                  example: "lic2"
+            example:
+              userId: "abc123"
+              licenseId: "lic2"
+      responses:
+        200:
+          description: License assigned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+              example:
+                message: "License assigned successfully"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+        404:
+          description: User or license not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "User or license not found"
+
+  /licenses/{id}:
+    put:
+      tags:
+        - Licenses
+      summary: Update license plan
+      description: >
+        Updates a license plan. Only admins can update licenses. Requires admin authentication (JWT).
+      operationId: updateLicense
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the license.
+          example: "lic2"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                  description: The price of the license.
+                  example: 20
+                maxCourses:
+                  type: number
+                  description: Maximum number of courses.
+                  example: 10
+                maxChaptersPerCourse:
+                  type: number
+                  description: Maximum chapters per course.
+                  example: 20
+                maxLessonsPerChapter:
+                  type: number
+                  description: Maximum lessons per chapter.
+                  example: 50
+                features:
+                  type: array
+                  items:
+                    type: string
+                  description: List of features included.
+                  example: ["All startup features", "Advanced analytics"]
+            example:
+              price: 20
+              maxCourses: 10
+              maxChaptersPerCourse: 20
+              maxLessonsPerChapter: 50
+              features: ["All startup features", "Advanced analytics"]
+      responses:
+        200:
+          description: License updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/License"
+              example:
+                _id: "lic2"
+                name: "startup"
+                price: 20
+                maxCourses: 10
+                maxChaptersPerCourse: 20
+                maxLessonsPerChapter: 50
+                features: ["All startup features", "Advanced analytics"]
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+        404:
+          description: License not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "License not found"
+
+  # === ENROLLMENT ENDPOINTS ===
+  /enrollments:
+    get:
+      tags:
+        - Enrollments
+      summary: List user enrollments
+      description: >
+        Returns a list of all enrollments for the authenticated user. Requires authentication (JWT).
+      operationId: listUserEnrollments
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of enrollments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Enrollment"
+              example:
+                - _id: "enr1"
+                  student: "abc123"
+                  course: "course1"
+                  enrolledAt: "2024-06-01T12:00:00Z"
+                  progress: 0
+                - _id: "enr2"
+                  student: "abc123"
+                  course: "course2"
+                  enrolledAt: "2024-06-02T12:00:00Z"
+                  progress: 50
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+
+    post:
+      tags:
+        - Enrollments
+      summary: Enroll in a course
+      description: >
+        Enrolls the authenticated user in a course. Requires authentication (JWT).
+      operationId: enrollInCourse
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courseId:
+                  type: string
+                  description: The unique identifier of the course to enroll in.
+                  example: "course1"
+      responses:
+        201:
+          description: Enrollment created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enrollment"
+              example:
+                _id: "enr1"
+                student: "abc123"
+                course: "course1"
+                enrolledAt: "2024-06-01T12:00:00Z"
+                progress: 0
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Missing required field: courseId"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (already enrolled or not allowed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Already enrolled in this course"
+
+  /enrollments/{id}:
+    get:
+      tags:
+        - Enrollments
+      summary: Get enrollment details
+      description: >
+        Returns details for a specific enrollment by its unique ID. Requires authentication (JWT).
+      operationId: getEnrollmentById
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the enrollment.
+          example: "enr1"
+      responses:
+        200:
+          description: Enrollment found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enrollment"
+              example:
+                _id: "enr1"
+                student: "abc123"
+                course: "course1"
+                enrolledAt: "2024-06-01T12:00:00Z"
+                progress: 0
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to view)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to view this enrollment"
+        404:
+          description: Enrollment not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Enrollment not found"
+
+  /enrollments/{id}:
+    put:
+      tags:
+        - Enrollments
+      summary: Update progress
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                completedLessonId:
+                  type: string
+      responses:
+        200:
+          description: Progress updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Enrollment"
+
+    delete:
+      tags:
+        - Enrollments
+      summary: Remove enrollment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Enrollment removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+
+  # === TRANSACTION ENDPOINTS ===
+  /transactions:
+    get:
+      tags:
+        - Transactions
+      summary: List user transactions
+      description: >
+        Returns a list of transactions for the authenticated user. Admins can filter by user ID. Requires authentication (JWT).
+      operationId: listTransactions
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: user
+          schema:
+            type: string
+          required: false
+          description: Filter transactions by user ID (admin only).
+          example: "abc123"
+      responses:
+        200:
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+              example:
+                - _id: "txn1"
+                  user: "abc123"
+                  type: "credit"
+                  amount: 10
+                  description: "Course purchase"
+                  relatedCourse: "course1"
+                  balance: 90
+                  createdAt: "2024-06-01T12:00:00Z"
+                - _id: "txn2"
+                  user: "def456"
+                  type: "debit"
+                  amount: 5
+                  description: "Course refund"
+                  relatedCourse: "course2"
+                  balance: 95
+                  createdAt: "2024-06-02T12:00:00Z"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to view)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to view these transactions"
+
+    post:
+      tags:
+        - Transactions
+      summary: Record transaction
+      description: >
+        Records a new transaction for the authenticated user. Requires authentication (JWT).
+      operationId: recordTransaction
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - amount
+                - description
+              properties:
+                type:
+                  type: string
+                  enum: [credit, debit]
+                  description: Transaction type.
+                  example: "credit"
+                amount:
+                  type: number
+                  description: Transaction amount.
+                  example: 10
+                description:
+                  type: string
+                  description: Description of the transaction.
+                  example: "Course purchase"
+                relatedCourse:
+                  type: string
+                  description: Related course ID (optional).
+                  example: "course1"
+            example:
+              type: "credit"
+              amount: 10
+              description: "Course purchase"
+              relatedCourse: "course1"
+      responses:
+        201:
+          description: Transaction recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+              example:
+                _id: "txn1"
+                user: "abc123"
+                type: "credit"
+                amount: 10
+                description: "Course purchase"
+                relatedCourse: "course1"
+                balance: 90
+                createdAt: "2024-06-01T12:00:00Z"
+        400:
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Missing required field: amount"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not allowed to record)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed to record transaction"
+
+  # === CONTACT & CAPTCHA ENDPOINTS ===
+  /captcha:
+    get:
+      tags:
+        - Contact
+      summary: Get CAPTCHA challenge
+      description: >
+        Returns a CAPTCHA challenge for the contact form. Public endpoint.
+      operationId: getCaptcha
+      responses:
+        200:
+          description: CAPTCHA challenge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Captcha"
+              example:
+                id: "captcha1"
+                question: "What is 2 + 2?"
+
+  /contact:
+    post:
+      tags:
+        - Contact
+      summary: Submit contact form
+      description: >
+        Submits a contact message. Requires a valid CAPTCHA answer. Public endpoint, but rate-limited.
+      operationId: submitContact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactMessage"
+            example:
+              name: "John Doe"
+              email: "john@example.com"
+              message: "I have a question."
+              captchaAnswer: "4"
+              captchaId: "captcha1"
+              honeypot: ""
+      responses:
+        200:
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+              example:
+                message: "Message sent successfully"
+        400:
+          description: Invalid CAPTCHA or validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid CAPTCHA answer"
+        429:
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Too many requests, please try again later."
+
+  # === ADMIN ENDPOINTS ===
+  /admin/login:
+    post:
+      tags:
+        - Admin
+      summary: Admin login
+      description: >
+        Authenticates an admin user and returns a JWT token with admin privileges. Use the token in the Authorization header for subsequent admin requests.
+      operationId: adminLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Admin email address.
+                  example: "admin@learningoo.com"
+                password:
+                  type: string
+                  description: Admin password.
+                  example: "adminpassword"
+                key:
+                  type: string
+                  description: Optional admin verification key (alternative to email).
+                  example: "SECRET_ADMIN_KEY"
+            example:
+              email: "admin@learningoo.com"
+              password: "adminpassword"
+      responses:
+        200:
+          description: Admin login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+              example:
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                user:
+                  _id: "admin123"
+                  name: "Admin"
+                  email: "admin@learningoo.com"
+                  role: "admin"
+        401:
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid email, key, or password"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+      security: []
+
+  /admin/summary:
+    get:
+      tags:
+        - Admin
+      summary: Get system summary
+      description: >
+        Returns a summary of system statistics for the admin dashboard, including user counts, course counts, and license distribution. Requires admin authentication (JWT).
+      operationId: getAdminSummary
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: System summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemOverview"
+              example:
+                totalUsers: 100
+                totalStudents: 80
+                totalTutors: 15
+                totalCourses: 20
+                totalCategories: 5
+                licenseDistribution:
+                  free: 50
+                  startup: 30
+                  advanced: 15
+                  professional: 5
+                topTutors:
+                  - _id: "tutor1"
+                    name: "Alice"
+                    earnings: 1200
+                  - _id: "tutor2"
+                    name: "Bob"
+                    earnings: 900
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+
+  /admin/users:
+    get:
+      tags:
+        - Admin
+      summary: List all users (admin)
+      description: >
+        Returns a list of all users in the system. Requires admin authentication (JWT).
+      operationId: adminListUsers
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+              example:
+                - _id: "abc123"
+                  name: "Alice"
+                  email: "alice@example.com"
+                  role: "student"
+                - _id: "def456"
+                  name: "Bob"
+                  email: "bob@example.com"
+                  role: "tutor"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+
+  /admin/transactions:
+    get:
+      tags:
+        - Admin
+      summary: List all transactions (admin)
+      description: >
+        Returns a list of all transactions in the system. Requires admin authentication (JWT).
+      operationId: adminListTransactions
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+              example:
+                - _id: "txn1"
+                  user: "abc123"
+                  type: "credit"
+                  amount: 10
+                  description: "Course purchase"
+                  relatedCourse: "course1"
+                  balance: 90
+                  createdAt: "2024-06-01T12:00:00Z"
+                - _id: "txn2"
+                  user: "def456"
+                  type: "debit"
+                  amount: 5
+                  description: "Course refund"
+                  relatedCourse: "course2"
+                  balance: 95
+                  createdAt: "2024-06-02T12:00:00Z"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Invalid or missing token"
+        403:
+          description: Forbidden (not an admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                message: "Not allowed: admin access required"
+
+  /admin/config:
+    get:
+      tags:
+        - Admin
+      summary: Get system configuration
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: System configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemConfig"
+
+    put:
+      tags:
+        - Admin
+      summary: Update system configuration
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                registrationEnabled:
+                  type: boolean
+                loginEnabled:
+                  type: boolean
+                defaultUserCredits:
+                  type: number
+      responses:
+        200:
+          description: Configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemConfig"
+
+# === TAGS DOCUMENTATION ===
+tags:
+  - name: Authentication
+    description: User authentication and registration
+  - name: Users
+    description: User profile management
+  - name: Courses
+    description: Course creation and management
+  - name: Chapters
+    description: Chapter organization within courses
+  - name: Lessons
+    description: Lesson content management
+  - name: Categories
+    description: Course categorization
+  - name: Licenses
+    description: Subscription plan management
+  - name: Enrollments
+    description: Student course enrollments
+  - name: Transactions
+    description: Financial transaction tracking
+  - name: Contact
+    description: Contact form and communication
+  - name: Admin
+    description: Administrative functions
