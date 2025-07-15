@@ -25,7 +25,7 @@ const ProfilePage = () => {
     return map;
   }, [allCourses]);
 
-  // Fetch licenses list to map id->name
+  // Fetch licenses list to map id-name
   const { data: licenses } = useQuery({
     queryKey: ["licenses"],
     queryFn: () => api.get("/licenses").then((r) => r.data),

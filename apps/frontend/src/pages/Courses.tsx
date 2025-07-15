@@ -29,7 +29,7 @@ const CoursesPage = () => {
   return (
     <Layout>
       <div className="py-12 container mx-auto flex gap-8">
-        {/* Desktop Sidebar - Hidden on mobile */}
+        {/* Desktop Sidebar - hidden on mobile! */}
         <aside className="hidden md:block w-48 shrink-0 space-y-2">
           <button
             onClick={() => setSelected("All")}
@@ -126,7 +126,7 @@ const CoursesPage = () => {
                       <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
                         {/* Course Info */}
                         <div className="space-y-3 md:space-y-4">
-                          {/* Title - now clickable */}
+                          {/* Title */}
                           <a
                             href={`/courses/${c.slug}`}
                             className="block hover:text-brand-dark transition-colors"
@@ -138,7 +138,7 @@ const CoursesPage = () => {
 
                           {/* Course Stats */}
                           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
-                            {/* Lesson count - now clickable */}
+                            {/* Lesson count */}
                             <a
                               href={`/courses/${c.slug}`}
                               className="flex items-center gap-1 hover:text-brand-dark transition-colors cursor-pointer"

@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 const placeholder =
   "https://cataas.com/cat/says/No%20Image?size=70&color=white&json=true";
 
-// Helper to determine if user is tutor
+// Determine if user is tutor
 const isTutor = (role?: string) => role === "tutor";
 
 const MyCoursesPage = () => {
@@ -15,7 +15,7 @@ const MyCoursesPage = () => {
   const navigate = useNavigate();
   if (!user) return null;
 
-  // Fetch all courses – reused for both roles
+  // Fetch all courses
   const { data: allCourses } = useQuery({
     queryKey: ["courses"],
     queryFn: () => api.get("/courses").then((r) => r.data),

@@ -56,7 +56,7 @@ const App = () => {
           <Route path="/my-courses" element={<MyCoursesPage />} />
           <Route path="/my-courses/new" element={<CreateCoursePage />} />
           <Route path="/my-courses/:id/edit" element={<EditCoursePage />} />
-          {/* Create lesson – only authenticated users (course authors) */}
+          {/* Create lesson only for course authors */}
           <Route
             path="/chapters/:id/lessons/new"
             element={<CreateLessonPage />}

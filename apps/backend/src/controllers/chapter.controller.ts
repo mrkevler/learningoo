@@ -17,7 +17,7 @@ export const getChapter = asyncHandler(async (req: Request, res: Response) => {
 
   if (!chapter) return res.status(404).json({ message: "Chapter not found" });
 
-  // Fetch lessons ordered by "order"
+  // Fetch lessons 
   const lessons = await LessonModel.find({ chapterId: (chapter as any)._id })
     .sort({ order: 1 })
     .select("title order createdAt updatedAt")

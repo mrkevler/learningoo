@@ -68,7 +68,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const user = await UserModel.findOne({ email }).select("+password");
-  // If regular user exists → normal flow
+  // If regular user exists - normal flow
   if (user) {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: "Invalid credentials" });

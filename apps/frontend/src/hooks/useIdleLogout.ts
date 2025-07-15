@@ -17,7 +17,7 @@ const useIdleLogout = (enabled: boolean) => {
         () => {
           dispatch(logout());
         },
-        IDLE_MINUTES * 60 * 1000
+        IDLE_MINUTES * 60 * 1000 // 30 minutes
       );
     };
 

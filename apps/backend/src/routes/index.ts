@@ -10,7 +10,7 @@ import licenseRoutes from "./license.routes";
 import categoryRoutes from "./category.routes";
 import contactRoutes from "./contact.routes";
 import transactionRoutes from "./transaction.routes";
-// TODO: import other feature routes
+// TODO: import feature routes here
 
 const router = Router();
 
