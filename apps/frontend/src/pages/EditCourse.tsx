@@ -415,31 +415,26 @@ const EditCoursePage = () => {
                               </button>
                             </div>
                           ) : (
-                            <div className="w-16 h-16 flex items-center justify-center">
-                              <ImageUpload
-                                type="chapter-cover"
-                                currentImage={undefined}
-                                onUploadSuccess={(urls) =>
-                                  setValue(
-                                    `chapters.${idx}.coverImage`,
-                                    urls[0]
-                                  )
-                                }
-                                onUploadError={(error) =>
-                                  console.error(
-                                    "Chapter cover upload error:",
-                                    error
-                                  )
-                                }
-                                className="w-16 h-16"
-                              >
-                                <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                                  <span className="text-xs text-gray-500">
-                                    Upload
-                                  </span>
-                                </div>
-                              </ImageUpload>
-                            </div>
+                            <ImageUpload
+                              type="chapter-cover"
+                              currentImage={undefined}
+                              onUploadSuccess={(urls) =>
+                                setValue(`chapters.${idx}.coverImage`, urls[0])
+                              }
+                              onUploadError={(error) =>
+                                console.error(
+                                  "Chapter cover upload error:",
+                                  error
+                                )
+                              }
+                              className="w-full h-16"
+                            >
+                              <div className="w-full h-16 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded">
+                                <span className="text-xs text-gray-500">
+                                  Upload
+                                </span>
+                              </div>
+                            </ImageUpload>
                           )}
                         </td>
                         <td className="px-4 py-3">
