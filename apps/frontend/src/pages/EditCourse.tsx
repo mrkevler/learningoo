@@ -396,26 +396,51 @@ const EditCoursePage = () => {
                           {idx + 1}
                         </td>
                         <td className="px-4 py-3">
-                          <ImageUpload
-                            type="chapter-cover"
-                            currentImage={watch(`chapters.${idx}.coverImage`)}
-                            onUploadSuccess={(urls) =>
-                              setValue(`chapters.${idx}.coverImage`, urls[0])
-                            }
-                            onUploadError={(error) =>
-                              console.error(
-                                "Chapter cover upload error:",
-                                error
-                              )
-                            }
-                            className="w-16 h-16"
-                          >
-                            <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-                              <span className="text-xs text-gray-500">
-                                Upload
-                              </span>
+                          {watch(`chapters.${idx}.coverImage`) ? (
+                            <div className="relative w-16 h-16">
+                              <img
+                                src={watch(`chapters.${idx}.coverImage`)}
+                                alt="Chapter Cover"
+                                className="w-16 h-16 object-cover rounded border border-gray-300 dark:border-gray-700"
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setValue(`chapters.${idx}.coverImage`, "")
+                                }
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow"
+                                title="Remove cover image"
+                              >
+                                ×
+                              </button>
                             </div>
-                          </ImageUpload>
+                          ) : (
+                            <div className="w-16 h-16 flex items-center justify-center">
+                              <ImageUpload
+                                type="chapter-cover"
+                                currentImage={undefined}
+                                onUploadSuccess={(urls) =>
+                                  setValue(
+                                    `chapters.${idx}.coverImage`,
+                                    urls[0]
+                                  )
+                                }
+                                onUploadError={(error) =>
+                                  console.error(
+                                    "Chapter cover upload error:",
+                                    error
+                                  )
+                                }
+                                className="w-16 h-16"
+                              >
+                                <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                                  <span className="text-xs text-gray-500">
+                                    Upload
+                                  </span>
+                                </div>
+                              </ImageUpload>
+                            </div>
+                          )}
                         </td>
                         <td className="px-4 py-3">
                           <input
