@@ -347,11 +347,9 @@ const EditCoursePage = () => {
           </div>
 
           {/* Chapters Table */}
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <label className="block font-semibold text-gray-800 dark:text-gray-100">
-                Chapters
-              </label>
+          <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-brand">Chapters</h2>
               <button
                 type="button"
                 onClick={() =>
@@ -367,7 +365,7 @@ const EditCoursePage = () => {
             </div>
 
             {fields.length > 0 && (
-              <div className="overflow-x-auto">
+              <div>
                 <table className="w-full border border-gray-300 dark:border-gray-600 rounded-lg">
                   <thead className="bg-gray-100 dark:bg-gray-800">
                     <tr>
@@ -474,7 +472,7 @@ const EditCoursePage = () => {
                 </table>
               </div>
             )}
-          </div>
+          </section>
 
           <button
             type="submit"
