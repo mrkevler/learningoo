@@ -10,7 +10,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node", "express"],
     "sourceMap": true
   },
   "include": ["src/**/*"],
