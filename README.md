@@ -7,7 +7,7 @@
 **Demo** 🌐 [](#)
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white) ![Express](https://img.shields.io/badge/Express.js-5-000000?logo=express&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white) ![Redux](https://img.shields.io/badge/Redux_Toolkit-2-764ABC?logo=redux&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)  
-![GitHub](https://img.shields.io/github/followers/mrkevler?label=Follow&style=social) ![License](https://img.shields.io/badge/License-MIT-blue)  
+![GitHub](https://img.shields.io/github/followers/mrkevler?label=Follow&style=social) ![License](https://img.shields.io/badge/License-MIT-blue) [![Netlify Status](https://api.netlify.com/api/v1/badges/49400fb2-33e9-4fe5-b572-990c76382d98/deploy-status)](https://app.netlify.com/projects/learningoo-dev/deploys) 
 ![Repo Size](https://img.shields.io/github/repo-size/mrkevler/learningoo) ![Last Commit](https://img.shields.io/github/last-commit/mrkevler/learningoo)
 [![Buy Me a Coffee](https://img.shields.io/badge/Support-Buy%20Me%20a%20Coffee-yellow)](https://buymeacoffee.com/mrkevler)
 
