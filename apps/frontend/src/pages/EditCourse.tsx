@@ -395,9 +395,9 @@ const EditCoursePage = () => {
                         <td className="px-4 py-3 text-gray-800 dark:text-gray-100 font-medium">
                           {idx + 1}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 align-middle text-center">
                           {watch(`chapters.${idx}.coverImage`) ? (
-                            <div className="relative w-16 h-16">
+                            <div className="relative w-16 h-16 mx-auto">
                               <img
                                 src={watch(`chapters.${idx}.coverImage`)}
                                 alt="Chapter Cover"
@@ -427,9 +427,9 @@ const EditCoursePage = () => {
                                   error
                                 )
                               }
-                              className="w-full h-16"
+                              className="w-16 h-16 mx-auto"
                             >
-                              <div className="w-full h-16 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded">
+                              <div className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded">
                                 <span className="text-xs text-gray-500">
                                   Upload
                                 </span>
