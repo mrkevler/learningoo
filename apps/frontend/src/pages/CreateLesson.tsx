@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Layout from "../components/Layout";
 import { api } from "../services/api";
+import { ImageUpload } from "../components/ImageUpload";
 
 // Allowed block types
 export type BlockType =
@@ -41,7 +42,7 @@ const defaultData: Record<BlockType, any> = {
   url: { href: "https://" },
   youtube: { url: "https://www.youtube.com/watch?v=" },
   image: {
-    src: `https://cataas.com/cat?${Date.now()}&width=800&height=400`,
+    src: "",
   },
 };
 
@@ -585,15 +586,21 @@ const CreateLessonPage = () => {
                           />
                         )}
                         {block.type === "image" && (
-                          <input
-                            value={(block.data as any).src}
-                            onChange={(e) =>
-                              updateBlock(block.id, { src: e.target.value })
-                            }
-                            placeholder="Image URL"
-                            className="w-full bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded text-black dark:text-white focus:ring-2 focus:ring-magenta-500 focus:outline-none"
-                            onClick={(e) => e.stopPropagation()}
-                          />
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <ImageUpload
+                              type="lesson-image"
+                              currentImage={(block.data as any).src}
+                              onUploadSuccess={(urls) =>
+                                updateBlock(block.id, { src: urls[0] })
+                              }
+                              onUploadError={(error) =>
+                                console.error(
+                                  "Lesson image upload error:",
+                                  error
+                                )
+                              }
+                            />
+                          </div>
                         )}
                       </div>
                     </>

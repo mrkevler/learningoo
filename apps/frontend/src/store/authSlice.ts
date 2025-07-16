@@ -13,6 +13,12 @@ interface User {
   bio?: string;
   categories?: string[];
   balance?: number;
+  profileImage?: string;
+  profileThumbnails?: {
+    small: string;
+    medium: string;
+    large: string;
+  };
 }
 interface AuthState {
   user: User | null;

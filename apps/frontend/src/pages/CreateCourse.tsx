@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../services/api";
 import { useAppSelector } from "../store";
 import { useNavigate } from "react-router-dom";
+import { ImageUpload } from "../components/ImageUpload";
 
 const schema = z.object({
   title: z.string().min(3, "Too short"),
@@ -27,10 +28,6 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
-
-// Fetch landscape cat image in 800x450px 16:9 ratio
-const catLandscape = () =>
-  `https://cataas.com/cat?width=800&height=450&rand=${Math.random()}`;
 
 const CreateCoursePage = () => {
   const queryClient = useQueryClient();
@@ -164,35 +161,22 @@ const CreateCoursePage = () => {
             )}
           </div>
 
-          {/* Cover image placeholder */}
+          {/* Cover image upload */}
           <div>
             <label className="block mb-1 text-gray-800 dark:text-gray-100">
               Cover Image
             </label>
-            <input
-              type="text"
-              {...register("coverImage")}
-              className={`w-full p-2 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-2 focus:ring-brand ${errors.coverImage ? "border border-red-500" : ""}`}
+            <ImageUpload
+              type="course-cover"
+              currentImage={watch("coverImage")}
+              onUploadSuccess={(urls) => setValue("coverImage", urls[0])}
+              onUploadError={(error) => console.error("Upload error:", error)}
             />
             {errors.coverImage && (
               <p className="text-red-500 text-sm">
                 {errors.coverImage.message}
               </p>
             )}
-            <div className="flex items-center gap-4 mt-2">
-              <img
-                src={watch("coverImage") || catLandscape()}
-                alt="placeholder"
-                className="h-32 w-32 object-cover rounded"
-              />
-              <button
-                type="button"
-                onClick={() => setValue("coverImage", catLandscape())}
-                className="bg-gray-700 text-white px-3 py-2 rounded"
-              >
-                Upload image
-              </button>
-            </div>
           </div>
 
           {/* Category */}
@@ -250,22 +234,24 @@ const CreateCoursePage = () => {
             )}
           </div>
 
-          {/* Photos list */}
+          {/* Course photos upload */}
           <div>
             <label className="block mb-1 text-gray-800 dark:text-gray-100">
               Course Content Photos
             </label>
-            <button
-              type="button"
-              className="bg-brand text-white px-3 py-1 rounded mb-2 border border-brand-dark hover:border-brand"
-              onClick={() => {
+            <ImageUpload
+              type="course-photos"
+              multiple={true}
+              maxFiles={5}
+              onUploadSuccess={(urls) => {
                 const current = getValues("photos") || [];
-                setValue("photos", [...current, catLandscape()]);
+                setValue("photos", [...current, ...urls]);
               }}
-            >
-              Upload photo
-            </button>
-            <div className="grid grid-cols-3 gap-2">
+              onUploadError={(error) =>
+                console.error("Photo upload error:", error)
+              }
+            />
+            <div className="grid grid-cols-3 gap-2 mt-4">
               {watch("photos")?.map((p, idx) => (
                 <div key={idx} className="relative">
                   <img
@@ -348,29 +334,20 @@ const CreateCoursePage = () => {
                   {...register(`chapters.${idx}.title` as const)}
                   className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white mb-2 focus:ring-2 focus:ring-brand"
                 />
-                <div className="flex items-center gap-2 mb-2">
-                  <input
-                    type="text"
-                    {...register(`chapters.${idx}.coverImage` as const)}
-                    className={`w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-brand ${errors.chapters?.[idx]?.coverImage ? "border border-red-500" : ""}`}
-                  />
-                  <img
-                    src={watch(`chapters.${idx}.coverImage`) || catLandscape()}
-                    alt="chap"
-                    className="h-12 w-12 object-cover rounded cursor-pointer"
-                    onClick={() =>
-                      setValue(`chapters.${idx}.coverImage`, catLandscape())
+                <div className="mb-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    Chapter Cover Image
+                  </p>
+                  <ImageUpload
+                    type="chapter-cover"
+                    currentImage={watch(`chapters.${idx}.coverImage`)}
+                    onUploadSuccess={(urls) =>
+                      setValue(`chapters.${idx}.coverImage`, urls[0])
+                    }
+                    onUploadError={(error) =>
+                      console.error("Chapter cover upload error:", error)
                     }
                   />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setValue(`chapters.${idx}.coverImage`, catLandscape())
-                    }
-                    className="bg-gray-700 text-white px-2 py-1 rounded"
-                  >
-                    Upload image
-                  </button>
                 </div>
                 {errors.chapters?.[idx]?.coverImage && (
                   <p className="text-red-500 text-xs">Missing field</p>
