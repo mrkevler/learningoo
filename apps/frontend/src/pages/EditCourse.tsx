@@ -395,9 +395,9 @@ const EditCoursePage = () => {
                         <td className="px-4 py-3 text-gray-800 dark:text-gray-100 font-medium">
                           {idx + 1}
                         </td>
-                        <td className="px-4 py-3 align-middle text-center">
+                        <td className="w-20 h-20 p-0 align-middle text-center">
                           {watch(`chapters.${idx}.coverImage`) ? (
-                            <div className="relative w-16 h-16 mx-auto">
+                            <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
                               <img
                                 src={watch(`chapters.${idx}.coverImage`)}
                                 alt="Chapter Cover"
@@ -427,11 +427,26 @@ const EditCoursePage = () => {
                                   error
                                 )
                               }
-                              className="w-16 h-16 mx-auto"
+                              className="w-16 h-16 mx-auto flex items-center justify-center"
                             >
-                              <div className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded">
-                                <span className="text-xs text-gray-500">
-                                  Upload
+                              <div className="w-16 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded cursor-pointer transition hover:border-brand">
+                                <svg
+                                  className="mx-auto mb-1 h-5 w-5 text-gray-400"
+                                  stroke="currentColor"
+                                  fill="none"
+                                  viewBox="0 0 48 48"
+                                >
+                                  <path
+                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                    strokeWidth={2}
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                                <span className="text-[10px] text-gray-500 leading-tight text-center">
+                                  Click to upload or drag and drop
+                                  <br />
+                                  JPEG, PNG, WebP up to 10MB
                                 </span>
                               </div>
                             </ImageUpload>
