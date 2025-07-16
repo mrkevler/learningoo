@@ -430,29 +430,17 @@ const EditCoursePage = () => {
                               className="w-16 h-16 mx-auto flex items-center justify-center"
                             >
                               <div className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded cursor-pointer transition hover:border-brand">
-                                {/* Icon-only placeholder, same as Cover Image uploader */}
                                 <svg
                                   className="h-7 w-7 text-gray-400"
-                                  fill="none"
                                   stroke="currentColor"
-                                  strokeWidth="2"
-                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  viewBox="0 0 48 48"
                                 >
-                                  <rect
-                                    x="4"
-                                    y="4"
-                                    width="16"
-                                    height="16"
-                                    rx="3"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    fill="none"
-                                  />
                                   <path
-                                    d="M12 8v8M8 12h8"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
+                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                    strokeWidth={2}
                                     strokeLinecap="round"
+                                    strokeLinejoin="round"
                                   />
                                 </svg>
                               </div>
