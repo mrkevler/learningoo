@@ -1,12 +1,27 @@
 import Layout from "../components/Layout";
 import { useAppSelector } from "../store";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../services/api";
-import React from "react";
+import React, { useState } from "react";
+import { ImageUpload } from "../components/ImageUpload";
 
 const ProfilePage = () => {
   const user = useAppSelector((s) => s.auth.user);
+  const queryClient = useQueryClient();
+  const [showProfileUpload, setShowProfileUpload] = useState(false);
+
+  // Mutation to update user profile image
+  const updateProfileMutation = useMutation({
+    mutationFn: (profileData: {
+      profileImage: string;
+      profileThumbnails?: Record<string, string>;
+    }) => api.put(`/users/${user?._id}`, profileData).then((r) => r.data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", user?._id] });
+      setShowProfileUpload(false);
+    },
+  });
   const { data: courses } = useQuery({
     queryKey: ["enrolledCourses"],
     queryFn: () => api.get("/courses/enrolled").then((r) => r.data),
@@ -65,9 +80,49 @@ const ProfilePage = () => {
     <Layout>
       <div className="max-w-4xl mx-auto py-20 space-y-10 px-4">
         <div className="flex flex-col items-center gap-4 bg-gray-800 dark:bg-gray-700 p-6 rounded-lg">
-          <div className="h-20 w-20 rounded-full bg-brand flex items-center justify-center text-3xl font-bold text-white">
-            {user.name[0]}
+          <div className="relative">
+            {user.profileImage ? (
+              <img
+                src={user.profileThumbnails?.large || user.profileImage}
+                alt="Profile"
+                className="h-20 w-20 rounded-full object-cover"
+              />
+            ) : (
+              <div className="h-20 w-20 rounded-full bg-brand flex items-center justify-center text-3xl font-bold text-white">
+                {user.name[0]}
+              </div>
+            )}
+            <button
+              onClick={() => setShowProfileUpload(!showProfileUpload)}
+              className="absolute -bottom-1 -right-1 bg-brand text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-brand-dark"
+            >
+              📷
+            </button>
           </div>
+
+          {showProfileUpload && (
+            <div className="w-full max-w-sm">
+              <ImageUpload
+                type="profile-photo"
+                currentImage={user.profileImage}
+                onUploadSuccess={(urls, thumbnails) => {
+                  updateProfileMutation.mutate({
+                    profileImage: urls[0],
+                    profileThumbnails: thumbnails
+                      ? {
+                          small: thumbnails["64"],
+                          medium: thumbnails["128"],
+                          large: thumbnails["200"],
+                        }
+                      : undefined,
+                  });
+                }}
+                onUploadError={(error) =>
+                  console.error("Profile upload error:", error)
+                }
+              />
+            </div>
+          )}
           <h2 className="text-2xl font-bold text-white">{user.name}</h2>
           <p className="text-gray-400">{user.email}</p>
           <p className="text-gray-400 capitalize">Role: {user.role}</p>

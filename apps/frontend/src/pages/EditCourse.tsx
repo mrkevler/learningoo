@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../services/api";
 import { useAppSelector } from "../store";
 import { useNavigate, useParams } from "react-router-dom";
+import { ImageUpload } from "../components/ImageUpload";
 
 const schema = z.object({
   title: z.string().min(3, "Too short"),
@@ -28,10 +29,6 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
-
-// Fetch a landscape cat image 800x450px 16:9 ratio
-const catLandscape = () =>
-  `https://cataas.com/cat?width=800&height=450&rand=${Math.random()}`;
 
 const EditCoursePage = () => {
   const { id } = useParams();
@@ -217,20 +214,12 @@ const EditCoursePage = () => {
                 {errors.coverImage.message}
               </p>
             )}
-            <div className="flex items-center gap-4 mt-2">
-              <img
-                src={watch("coverImage") || catLandscape()}
-                alt="placeholder"
-                className="h-32 w-32 object-cover rounded"
-              />
-              <button
-                type="button"
-                onClick={() => setValue("coverImage", catLandscape())}
-                className="bg-gray-700 text-white px-3 py-2 rounded"
-              >
-                Upload image
-              </button>
-            </div>
+            <ImageUpload
+              type="course-cover"
+              currentImage={watch("coverImage")}
+              onUploadSuccess={(urls) => setValue("coverImage", urls[0])}
+              onUploadError={(error) => console.error("Upload error:", error)}
+            />
           </div>
 
           {/* Category */}
@@ -293,16 +282,18 @@ const EditCoursePage = () => {
             <label className="block mb-1 text-gray-800 dark:text-gray-100">
               Course Content Photos
             </label>
-            <button
-              type="button"
-              className="bg-brand text-white px-3 py-1 rounded mb-2"
-              onClick={() => {
+            <ImageUpload
+              type="course-photos"
+              multiple={true}
+              maxFiles={5}
+              onUploadSuccess={(urls) => {
                 const current = getValues("photos") || [];
-                setValue("photos", [...current, catLandscape()]);
+                setValue("photos", [...current, ...urls]);
               }}
-            >
-              Upload photo
-            </button>
+              onUploadError={(error) =>
+                console.error("Photo upload error:", error)
+              }
+            />
             <div className="grid grid-cols-3 gap-2">
               {watch("photos")?.map((p, idx) => (
                 <div key={idx} className="relative">
@@ -366,7 +357,7 @@ const EditCoursePage = () => {
                 onClick={() =>
                   append({
                     title: "",
-                    coverImage: catLandscape(),
+                    coverImage: "",
                   })
                 }
                 className="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark"
@@ -407,20 +398,26 @@ const EditCoursePage = () => {
                           {idx + 1}
                         </td>
                         <td className="px-4 py-3">
-                          <img
-                            src={
-                              watch(`chapters.${idx}.coverImage`) ||
-                              catLandscape()
+                          <ImageUpload
+                            type="chapter-cover"
+                            currentImage={watch(`chapters.${idx}.coverImage`)}
+                            onUploadSuccess={(urls) =>
+                              setValue(`chapters.${idx}.coverImage`, urls[0])
                             }
-                            alt="chapter cover"
-                            className="h-16 w-16 object-cover rounded cursor-pointer"
-                            onClick={() =>
-                              setValue(
-                                `chapters.${idx}.coverImage`,
-                                catLandscape()
+                            onUploadError={(error) =>
+                              console.error(
+                                "Chapter cover upload error:",
+                                error
                               )
                             }
-                          />
+                            className="w-16 h-16"
+                          >
+                            <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
+                              <span className="text-xs text-gray-500">
+                                Upload
+                              </span>
+                            </div>
+                          </ImageUpload>
                         </td>
                         <td className="px-4 py-3">
                           <input
@@ -447,10 +444,7 @@ const EditCoursePage = () => {
                             <button
                               type="button"
                               onClick={() =>
-                                setValue(
-                                  `chapters.${idx}.coverImage`,
-                                  catLandscape()
-                                )
+                                setValue(`chapters.${idx}.coverImage`, "")
                               }
                               className="bg-gray-700 text-white px-2 py-1 rounded text-sm hover:bg-gray-600"
                             >

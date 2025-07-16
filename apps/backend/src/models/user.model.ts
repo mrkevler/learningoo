@@ -11,6 +11,12 @@ export interface IUser extends Document {
   bio?: string;
   balance: number;
   categories: Schema.Types.ObjectId[];
+  profileImage?: string;
+  profileThumbnails?: {
+    small: string;
+    medium: string;
+    large: string;
+  };
   createdAt: Date;
   updatedAt: Date;
   licenseId?: Schema.Types.ObjectId;
@@ -33,6 +39,15 @@ const userSchema = new Schema<IUser>(
     bio: { type: String, default: null },
     categories: [{ type: Schema.Types.ObjectId, ref: "Category", default: [] }],
     balance: { type: Number, default: 100 },
+    profileImage: { type: String, default: null },
+    profileThumbnails: {
+      type: {
+        small: { type: String },
+        medium: { type: String },
+        large: { type: String },
+      },
+      default: null,
+    },
   },
   { timestamps: true }
 );

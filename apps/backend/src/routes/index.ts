@@ -10,6 +10,7 @@ import licenseRoutes from "./license.routes";
 import categoryRoutes from "./category.routes";
 import contactRoutes from "./contact.routes";
 import transactionRoutes from "./transaction.routes";
+import uploadRoutes from "./upload.routes";
 // TODO: import feature routes here
 
 const router = Router();
@@ -24,6 +25,7 @@ router.use("/licenses", licenseRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/", contactRoutes);
 router.use("/transactions", transactionRoutes);
+router.use("/upload", uploadRoutes);
 router.use("/admin", require("./admin.routes").default);
 
 export default router;
