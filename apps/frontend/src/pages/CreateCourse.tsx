@@ -201,8 +201,10 @@ const CreateCoursePage = () => {
               // Show upload area
               <ImageUpload
                 type="course-cover"
-                currentImage={undefined}
-                onUploadSuccess={(urls) => setValue("coverImage", urls[0])}
+                currentImage={watch("coverImage")}
+                onUploadSuccess={(urls) =>
+                  setValue("coverImage", urls[0], { shouldValidate: true })
+                }
                 onUploadError={(error) => console.error("Upload error:", error)}
               />
             )}
