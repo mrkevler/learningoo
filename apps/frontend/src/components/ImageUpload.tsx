@@ -179,6 +179,16 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   };
 
   const handleCropSave = async (croppedImageBlob: Blob) => {
+    // Close modal immediately
+    const tempUrlToCleanup = cropState.tempImageUrl;
+    setCropState({ showCropEditor: false, tempImageUrl: null });
+
+    // Clean up temp URL
+    if (tempUrlToCleanup) {
+      URL.revokeObjectURL(tempUrlToCleanup);
+    }
+
+    // Start upload process in background
     setUploadProgress({ uploading: true, progress: 0 });
 
     try {
@@ -215,12 +225,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         error.response?.data?.error || error.message || "Upload failed";
       setUploadProgress({ uploading: false, progress: 0, error: errorMessage });
       onUploadError?.(errorMessage);
-    } finally {
-      // Clean up
-      if (cropState.tempImageUrl) {
-        URL.revokeObjectURL(cropState.tempImageUrl);
-      }
-      setCropState({ showCropEditor: false, tempImageUrl: null });
     }
   };
 
