@@ -190,7 +190,7 @@ const CreateCoursePage = () => {
                   <button
                     type="button"
                     onClick={() => setValue("coverImage", "")}
-                    className="absolute -top-1 -right-1 bg-gray-100 bg-opacity-15 text-gray-800 dark:text-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-opacity-25 shadow-lg"
+                    className="absolute -top-1 -right-1 bg-gray-100 bg-opacity-30 text-gray-800 dark:text-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-opacity-25 shadow-lg"
                     title="Remove image"
                   >
                     ×
@@ -297,7 +297,7 @@ const CreateCoursePage = () => {
                         current.filter((_, i) => i !== idx)
                       );
                     }}
-                    className="absolute top-1 right-1 bg-gray-100 bg-opacity-15 text-gray-800 dark:text-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-opacity-25"
+                    className="absolute top-1 right-1 bg-gray-100 bg-opacity-30 text-gray-800 dark:text-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-opacity-25"
                   >
                     ×
                   </button>
@@ -415,7 +415,7 @@ const CreateCoursePage = () => {
                           onClick={() =>
                             setValue(`chapters.${idx}.coverImage`, "")
                           }
-                          className="absolute -top-1 -right-1 bg-gray-100 bg-opacity-15 text-gray-800 dark:text-gray-200 rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-opacity-25 shadow-lg"
+                          className="absolute -top-1 -right-1 bg-gray-100 bg-opacity-30 text-gray-800 dark:text-gray-200 rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-opacity-25 shadow-lg"
                           title="Remove image"
                         >
                           ×
