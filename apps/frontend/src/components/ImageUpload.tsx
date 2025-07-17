@@ -268,6 +268,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={handleClick}
+          data-upload-clickable="true"
         >
           <input
             ref={fileInputRef}

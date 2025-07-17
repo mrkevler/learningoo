@@ -586,7 +586,20 @@ const CreateLessonPage = () => {
                           />
                         )}
                         {block.type === "image" && (
-                          <div onClick={(e) => e.stopPropagation()}>
+                          <div
+                            onClick={(e) => {
+                              // Only stop propagation if not clicking on upload elements
+                              const target = e.target as HTMLElement;
+                              if (
+                                !target.closest("[data-upload-clickable]") &&
+                                !target.closest("svg") &&
+                                target.tagName !== "svg" &&
+                                target.tagName !== "path"
+                              ) {
+                                e.stopPropagation();
+                              }
+                            }}
+                          >
                             <LessonImageUpload
                               currentImage={(block.data as any).src}
                               onUploadSuccess={(url: string) =>
