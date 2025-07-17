@@ -418,19 +418,19 @@ const EditCoursePage = () => {
 
                   {watch(`chapters.${idx}.coverImage`) ? (
                     // Show uploaded image with delete button
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 mt-2">
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mt-2 flex justify-center">
                       <div className="relative inline-block">
                         <img
                           src={watch(`chapters.${idx}.coverImage`)}
                           alt={`Chapter ${idx + 1} Cover`}
-                          className="h-48 w-48 object-cover rounded-lg shadow-md mx-auto"
+                          className="h-24 w-24 object-cover rounded-lg shadow-md"
                         />
                         <button
                           type="button"
                           onClick={() =>
                             setValue(`chapters.${idx}.coverImage`, "")
                           }
-                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 shadow-lg"
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow-lg"
                           title="Remove image"
                         >
                           ×
