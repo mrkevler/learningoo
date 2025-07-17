@@ -51,6 +51,19 @@ app.get("/api/health", (_, res) => {
   res.status(200).json({ status: "ok" });
 });
 
+// Root endpoint for basic health checks and info
+app.get("/", (_, res) => {
+  res.status(200).json({
+    message: "Learningoo API Server",
+    version: "0.1.0",
+    status: "running",
+    endpoints: {
+      health: "/api/health",
+      docs: "/api",
+    },
+  });
+});
+
 // TODO: mount routes here
 app.use("/api", routes);
 
