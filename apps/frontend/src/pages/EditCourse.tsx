@@ -77,7 +77,7 @@ const EditCoursePage = () => {
       reset({
         title: course.title || "",
         coverImage: course.coverImage || "",
-        categoryId: course.categoryId || "",
+        categoryId: course.categoryId?._id || course.categoryId || "",
         description: course.description || "",
         photos: course.photos || [],
         welcomeEmailBody: course.welcomeEmailBody || "",
@@ -89,7 +89,7 @@ const EditCoursePage = () => {
                 coverImage: ch.coverImage || "",
                 _id: ch._id,
               }))
-            : [{ title: "", coverImage: "" }],
+            : [],
       });
     }
   }, [course, reset]);

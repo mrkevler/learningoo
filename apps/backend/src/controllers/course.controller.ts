@@ -69,18 +69,20 @@ export const updateCourse = asyncHandler(
     if (!course) return res.status(404).json({ message: "Course not found" });
 
     // Handle chapters update if provided
-    if (Array.isArray(chapters) && chapters.length > 0) {
+    if (Array.isArray(chapters)) {
       // Remove existing chapters for this course
       await ChapterModel.deleteMany({ courseId: course._id });
 
-      // Create new chapters
-      const docs = chapters.map((ch: any, idx: number) => ({
-        title: ch.title,
-        coverImage: ch.coverImage,
-        courseId: course._id,
-        order: idx + 1,
-      }));
-      await ChapterModel.insertMany(docs);
+      // Create new chapters if any
+      if (chapters.length > 0) {
+        const docs = chapters.map((ch: any, idx: number) => ({
+          title: ch.title,
+          coverImage: ch.coverImage,
+          courseId: course._id,
+          order: idx + 1,
+        }));
+        await ChapterModel.insertMany(docs);
+      }
     }
 
     res.json(course);
