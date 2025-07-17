@@ -256,11 +256,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       <div className={`relative ${className}`}>
         <div
           className={`
-            border-2 border-dashed rounded-lg p-6 cursor-pointer transition-all
+            border-2 border-dashed rounded-lg p-6 cursor-pointer transition-all duration-200
             ${
               dragActive
-                ? "border-brand bg-brand/5"
-                : "border-gray-300 dark:border-gray-600 hover:border-brand"
+                ? "border-brand bg-brand/5 shadow-lg shadow-brand/20"
+                : "border-gray-300 dark:border-gray-600 hover:border-brand hover:bg-brand/5 hover:shadow-lg hover:shadow-brand/10"
             }
             ${uploadProgress.uploading ? "pointer-events-none opacity-50" : ""}
           `}
@@ -295,13 +295,17 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           ) : (
             <>
               {children || (
-                <div className="text-center">
-                  <div className="mb-4">
+                <div className="text-center group">
+                  <div className="mb-4 transition-all duration-200 group-hover:scale-110">
                     <svg
-                      className="mx-auto h-12 w-12 text-gray-400"
+                      className="mx-auto h-12 w-12 text-gray-400 group-hover:text-brand transition-colors duration-200 group-hover:drop-shadow-lg"
                       stroke="currentColor"
                       fill="none"
                       viewBox="0 0 48 48"
+                      style={{
+                        filter: "brightness(1) contrast(1)",
+                        transition: "all 0.2s ease-in-out",
+                      }}
                     >
                       <path
                         d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
@@ -311,11 +315,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                       />
                     </svg>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    <p className="font-medium">
+                  <div className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-brand transition-colors duration-200">
+                    <p className="font-medium group-hover:font-semibold transition-all duration-200">
                       Click to upload or drag and drop
                     </p>
-                    <p className="mt-1">
+                    <p className="mt-1 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors duration-200">
                       JPEG, PNG, WebP up to 10MB
                       {multiple && ` (max ${maxFiles} files)`}
                       {(type === "course-cover" || type === "lesson-image") &&

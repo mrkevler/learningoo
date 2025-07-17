@@ -124,14 +124,9 @@ const EditLessonPage = () => {
   };
 
   const updateBlock = (id: string, newData: any) => {
-    console.log("Updating block:", id, "with data:", newData);
-    setBlocks((prev) => {
-      const updated = prev.map((b) =>
-        b.id === id ? { ...b, data: newData } : b
-      );
-      console.log("Updated blocks:", updated);
-      return updated;
-    });
+    setBlocks((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, data: newData } : b))
+    );
   };
 
   const moveBlock = (fromIndex: number, toIndex: number) => {
@@ -383,14 +378,6 @@ const EditLessonPage = () => {
       alert("Please provide lesson title");
       return;
     }
-
-    // Debug: Log blocks before saving
-    console.log("Saving lesson with blocks:", blocks);
-    console.log(
-      "Image blocks:",
-      blocks.filter((b) => b.type === "image")
-    );
-
     mutation.mutate({
       title,
       contentBlocks: blocks,

@@ -75,10 +75,27 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
       const scaleY = newCanvasHeight / image.height;
       const initialScale = Math.max(scaleX, scaleY);
 
+      // Calculate centered position but ensure it covers the canvas
+      const imageWidth = image.width * initialScale;
+      const imageHeight = image.height * initialScale;
+
+      // Center the image, but ensure it covers the entire canvas
+      let centerX = (CANVAS_WIDTH - imageWidth) / 2;
+      let centerY = (newCanvasHeight - imageHeight) / 2;
+
+      // Apply boundary constraints
+      const minX = CANVAS_WIDTH - imageWidth;
+      const maxX = 0;
+      const constrainedX = Math.min(maxX, Math.max(minX, centerX));
+
+      const minY = newCanvasHeight - imageHeight;
+      const maxY = 0;
+      const constrainedY = Math.min(maxY, Math.max(minY, centerY));
+
       setImageState({
         scale: initialScale,
-        x: (CANVAS_WIDTH - image.width * initialScale) / 2,
-        y: (newCanvasHeight - image.height * initialScale) / 2,
+        x: constrainedX,
+        y: constrainedY,
       });
     },
     [image, CANVAS_WIDTH]
@@ -212,12 +229,30 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || !image) return;
+
+    // Calculate new position
+    const newX = e.clientX - dragStart.x;
+    const newY = e.clientY - dragStart.y;
+
+    // Calculate image boundaries to prevent going outside crop area
+    const imageWidth = image.width * imageState.scale;
+    const imageHeight = image.height * imageState.scale;
+
+    // Constrain X position - image must always cover the canvas
+    const minX = CANVAS_WIDTH - imageWidth;
+    const maxX = 0;
+    const constrainedX = Math.min(maxX, Math.max(minX, newX));
+
+    // Constrain Y position - image must always cover the canvas
+    const minY = CANVAS_HEIGHT - imageHeight;
+    const maxY = 0;
+    const constrainedY = Math.min(maxY, Math.max(minY, newY));
 
     setImageState((prev) => ({
       ...prev,
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y,
+      x: constrainedX,
+      y: constrainedY,
     }));
   };
 
@@ -225,12 +260,39 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
     setIsDragging(false);
   };
 
-  // Zoom controls
+  // Zoom controls with boundary constraints
   const handleZoom = (direction: "in" | "out") => {
+    if (!image) return;
+
     const zoomFactor = direction === "in" ? 1.1 : 0.9;
+    const newScale = imageState.scale * zoomFactor;
+
+    // Calculate minimum scale needed to cover the canvas
+    const minScaleX = CANVAS_WIDTH / image.width;
+    const minScaleY = CANVAS_HEIGHT / image.height;
+    const minScale = Math.max(minScaleX, minScaleY);
+
+    // Apply constraints: minimum scale to cover canvas maximum scale of 5x
+    const constrainedScale = Math.max(minScale, Math.min(5, newScale));
+
+    // Calculate new image dimensions
+    const newImageWidth = image.width * constrainedScale;
+    const newImageHeight = image.height * constrainedScale;
+
+    // Adjust position to keep image covering the canvas
+    const minX = CANVAS_WIDTH - newImageWidth;
+    const maxX = 0;
+    const constrainedX = Math.min(maxX, Math.max(minX, imageState.x));
+
+    const minY = CANVAS_HEIGHT - newImageHeight;
+    const maxY = 0;
+    const constrainedY = Math.min(maxY, Math.max(minY, imageState.y));
+
     setImageState((prev) => ({
       ...prev,
-      scale: Math.max(0.1, Math.min(5, prev.scale * zoomFactor)),
+      scale: constrainedScale,
+      x: constrainedX,
+      y: constrainedY,
     }));
   };
 
