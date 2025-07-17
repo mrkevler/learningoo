@@ -13,7 +13,7 @@ const schema = z.object({
   title: z.string().min(3, "Too short"),
   coverImage: z.string().url({ message: "Missing field" }),
   categoryId: z.string({ required_error: "Select category" }),
-  description: z.string().min(10),
+  description: z.string().min(40),
   photos: z.array(z.string()).min(1, "Missing field"),
   welcomeEmailBody: z.string().min(10, "Enter body"),
   price: z.number().min(0),
@@ -22,9 +22,10 @@ const schema = z.object({
       z.object({
         title: z.string().min(2),
         coverImage: z.string().url({ message: "Missing field" }),
+        _id: z.string().optional(),
       })
     )
-    .min(1),
+    .min(0),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -139,7 +140,7 @@ const CreateCoursePage = () => {
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto py-10">
+      <div className="max-w-4xl mx-auto py-10">
         <h1 className="text-3xl font-bold text-brand mb-6">Create Course</h1>
         <form
           onKeyDown={handleFormKey}
@@ -161,22 +162,27 @@ const CreateCoursePage = () => {
             )}
           </div>
 
-          {/* Cover image upload */}
+          {/* Cover image placeholder */}
           <div>
             <label className="block mb-1 text-gray-800 dark:text-gray-100">
               Cover Image
             </label>
-            <ImageUpload
-              type="course-cover"
-              currentImage={watch("coverImage")}
-              onUploadSuccess={(urls) => setValue("coverImage", urls[0])}
-              onUploadError={(error) => console.error("Upload error:", error)}
+            <input
+              type="text"
+              {...register("coverImage")}
+              className={`w-full p-2 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-2 focus:ring-brand ${errors.coverImage ? "border border-red-500" : ""}`}
             />
             {errors.coverImage && (
               <p className="text-red-500 text-sm">
                 {errors.coverImage.message}
               </p>
             )}
+            <ImageUpload
+              type="course-cover"
+              currentImage={watch("coverImage")}
+              onUploadSuccess={(urls) => setValue("coverImage", urls[0])}
+              onUploadError={(error) => console.error("Upload error:", error)}
+            />
           </div>
 
           {/* Category */}
@@ -251,7 +257,7 @@ const CreateCoursePage = () => {
                 console.error("Photo upload error:", error)
               }
             />
-            <div className="grid grid-cols-3 gap-2 mt-4">
+            <div className="grid grid-cols-3 gap-2">
               {watch("photos")?.map((p, idx) => (
                 <div key={idx} className="relative">
                   <img
@@ -305,75 +311,119 @@ const CreateCoursePage = () => {
           </div>
 
           {/* Chapters */}
-          <div className="space-y-4">
-            <label className="block font-semibold text-gray-800 dark:text-gray-100">
-              Chapters
-            </label>
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-brand">Chapters</h2>
+              <button
+                type="button"
+                onClick={() =>
+                  append({
+                    title: "",
+                    coverImage: "",
+                  })
+                }
+                className="bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-700 dark:hover:bg-gray-600"
+              >
+                + Add Chapter {fields.length + 1}
+              </button>
+            </div>
+
             {fields.map((field, idx) => (
               <div
                 key={field.id}
-                className="border p-4 rounded bg-gray-100 dark:bg-gray-800"
+                className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6 border border-gray-200 dark:border-gray-700"
               >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-semibold text-gray-800 dark:text-gray-100">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                     Chapter {idx + 1}
                   </h3>
-                  {idx > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => remove(idx)}
-                      className="text-red-500"
-                    >
-                      Remove
-                    </button>
+                  <button
+                    type="button"
+                    onClick={() => remove(idx)}
+                    className="text-red-500 hover:text-red-700 font-medium px-3 py-1 rounded border border-red-500 hover:bg-red-50 dark:hover:bg-red-900"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                {/* Chapter Title */}
+                <div className="mb-6">
+                  <label className="block mb-1 text-gray-800 dark:text-gray-100">
+                    Chapter Title
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Chapter Title"
+                    {...register(`chapters.${idx}.title` as const)}
+                    className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-2 focus:ring-brand"
+                  />
+                  {errors.chapters?.[idx]?.title && (
+                    <p className="text-red-500 text-sm mt-1">Required</p>
                   )}
                 </div>
-                <input
-                  type="text"
-                  placeholder="Chapter Title"
-                  {...register(`chapters.${idx}.title` as const)}
-                  className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white mb-2 focus:ring-2 focus:ring-brand"
-                />
-                <div className="mb-2">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+
+                {/* Chapter Cover Image */}
+                <div>
+                  <label className="block mb-1 text-gray-800 dark:text-gray-100">
                     Chapter Cover Image
-                  </p>
-                  <ImageUpload
-                    type="chapter-cover"
-                    currentImage={watch(`chapters.${idx}.coverImage`)}
-                    onUploadSuccess={(urls) =>
-                      setValue(`chapters.${idx}.coverImage`, urls[0])
-                    }
-                    onUploadError={(error) =>
-                      console.error("Chapter cover upload error:", error)
-                    }
+                  </label>
+                  <input
+                    type="text"
+                    {...register(`chapters.${idx}.coverImage` as const)}
+                    className={`w-full p-2 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-2 focus:ring-brand ${errors.chapters?.[idx]?.coverImage ? "border border-red-500" : ""}`}
                   />
+                  {errors.chapters?.[idx]?.coverImage && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Valid URL required
+                    </p>
+                  )}
+
+                  {watch(`chapters.${idx}.coverImage`) ? (
+                    // Show uploaded image with delete button
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 mt-2 flex justify-center">
+                      <div className="relative inline-block">
+                        <img
+                          src={watch(`chapters.${idx}.coverImage`)}
+                          alt={`Chapter ${idx + 1} Cover`}
+                          className="h-24 w-24 object-cover rounded-lg shadow-md"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setValue(`chapters.${idx}.coverImage`, "")
+                          }
+                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow-lg"
+                          title="Remove image"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // Show upload area
+                    <ImageUpload
+                      type="chapter-cover"
+                      currentImage={undefined}
+                      onUploadSuccess={(urls) =>
+                        setValue(`chapters.${idx}.coverImage`, urls[0])
+                      }
+                      onUploadError={(error) =>
+                        console.error("Chapter cover upload error:", error)
+                      }
+                    />
+                  )}
                 </div>
-                {errors.chapters?.[idx]?.coverImage && (
-                  <p className="text-red-500 text-xs">Missing field</p>
-                )}
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() =>
-                append({
-                  title: "",
-                  coverImage: "",
-                })
-              }
-              className="bg-gray-700 text-white px-4 py-2 rounded"
-            >
-              + Add another chapter
-            </button>
           </div>
 
           <button
             type="submit"
             tabIndex={-1}
             className="bg-brand text-white px-6 py-2 rounded"
+            disabled={mutation.isPending}
           >
-            Create Course
+            {mutation.isPending ? "Creating..." : "Create Course"}
           </button>
         </form>
       </div>
