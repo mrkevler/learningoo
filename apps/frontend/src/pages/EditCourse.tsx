@@ -415,18 +415,41 @@ const EditCoursePage = () => {
                       Valid URL required
                     </p>
                   )}
-                  <ImageUpload
-                    type="chapter-cover"
-                    currentImage={
-                      watch(`chapters.${idx}.coverImage`) || undefined
-                    }
-                    onUploadSuccess={(urls) =>
-                      setValue(`chapters.${idx}.coverImage`, urls[0])
-                    }
-                    onUploadError={(error) =>
-                      console.error("Chapter cover upload error:", error)
-                    }
-                  />
+
+                  {watch(`chapters.${idx}.coverImage`) ? (
+                    // Show uploaded image with delete button
+                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 mt-2">
+                      <div className="relative inline-block">
+                        <img
+                          src={watch(`chapters.${idx}.coverImage`)}
+                          alt={`Chapter ${idx + 1} Cover`}
+                          className="h-48 w-48 object-cover rounded-lg shadow-md mx-auto"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setValue(`chapters.${idx}.coverImage`, "")
+                          }
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 shadow-lg"
+                          title="Remove image"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // Show upload area
+                    <ImageUpload
+                      type="chapter-cover"
+                      currentImage={undefined}
+                      onUploadSuccess={(urls) =>
+                        setValue(`chapters.${idx}.coverImage`, urls[0])
+                      }
+                      onUploadError={(error) =>
+                        console.error("Chapter cover upload error:", error)
+                      }
+                    />
+                  )}
                 </div>
               </div>
             ))}
