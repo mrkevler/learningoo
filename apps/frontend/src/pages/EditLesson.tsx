@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Layout from "../components/Layout";
 import { api } from "../services/api";
-import { ImageUpload } from "../components/ImageUpload";
+import { LessonImageUpload } from "../components/ImageUpload";
 
 // Allowed block types
 export type BlockType =
@@ -585,13 +585,12 @@ const EditLessonPage = () => {
                         )}
                         {block.type === "image" && (
                           <div onClick={(e) => e.stopPropagation()}>
-                            <ImageUpload
-                              type="lesson-image"
+                            <LessonImageUpload
                               currentImage={(block.data as any).src}
-                              onUploadSuccess={(urls) =>
-                                updateBlock(block.id, { src: urls[0] })
+                              onUploadSuccess={(url: string) =>
+                                updateBlock(block.id, { src: url })
                               }
-                              onUploadError={(error) =>
+                              onUploadError={(error: string) =>
                                 console.error(
                                   "Lesson image upload error:",
                                   error

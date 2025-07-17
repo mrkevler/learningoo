@@ -351,7 +351,6 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
               <ul className="list-disc list-inside space-y-1">
                 <li>Drag the image to reposition</li>
                 <li>Use zoom buttons to scale</li>
-                <li>The dashed border shows crop area</li>
                 <li>Preview shows final result</li>
               </ul>
             </div>
