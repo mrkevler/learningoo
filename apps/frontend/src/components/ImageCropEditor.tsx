@@ -316,41 +316,29 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
         <div className="flex flex-col xl:flex-row gap-6">
           {/* Main editing area */}
           <div className="flex-1">
-            {/* Aspect Ratio Selector */}
+            {/* Compact Aspect Ratio Selector */}
             {allowAspectRatioChange && aspectRatioOptions.length > 1 && (
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                  Choose Aspect Ratio:
-                </h3>
-                <div className="flex gap-3 mb-4">
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3 mb-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                    Aspect Ratio:
+                  </span>
                   {aspectRatioOptions.map(({ ratio, label, description }) => (
                     <button
                       key={ratio}
                       onClick={() => handleAspectRatioChange(ratio)}
-                      className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                      className={`px-3 py-1.5 rounded text-sm font-medium transition-all ${
                         currentAspectRatio === ratio
-                          ? "bg-brand text-white shadow-md transform scale-105"
+                          ? "bg-brand text-white shadow-md"
                           : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
                       }`}
                     >
-                      <div className="font-bold">{label}</div>
-                      <div className="text-xs opacity-75">{description}</div>
+                      {label}
                     </button>
                   ))}
-                </div>
-
-                {/* Live aspect ratio preview */}
-                <div className="p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800">
-                  <div
-                    className="bg-gray-300 dark:bg-gray-600 rounded mx-auto shadow-inner"
-                    style={{
-                      width: "120px",
-                      height: `${120 / currentAspectRatio}px`,
-                    }}
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-                    Preview: {currentAspectRatio.toFixed(2)}:1 ratio
-                  </p>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                    Current: {currentAspectRatio.toFixed(2)}:1
+                  </span>
                 </div>
               </div>
             )}

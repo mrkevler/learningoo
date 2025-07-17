@@ -107,7 +107,8 @@ const LessonDetailPage = () => {
             <img
               src={block.data.src}
               alt="lesson img"
-              className="mx-auto rounded-lg shadow-lg max-w-full"
+              className="mx-auto rounded-lg shadow-lg max-w-full h-auto object-contain"
+              style={{ aspectRatio: "auto" }}
             />
           </div>
         );
