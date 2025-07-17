@@ -177,12 +177,35 @@ const CreateCoursePage = () => {
                 {errors.coverImage.message}
               </p>
             )}
-            <ImageUpload
-              type="course-cover"
-              currentImage={watch("coverImage")}
-              onUploadSuccess={(urls) => setValue("coverImage", urls[0])}
-              onUploadError={(error) => console.error("Upload error:", error)}
-            />
+
+            {watch("coverImage") ? (
+              // Show uploaded image with delete button
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 mt-2 flex justify-center">
+                <div className="relative inline-block">
+                  <img
+                    src={watch("coverImage")}
+                    alt="Course Cover"
+                    className="h-32 w-32 object-cover rounded-lg shadow-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setValue("coverImage", "")}
+                    className="absolute -top-1 -right-1 bg-gray-100 bg-opacity-15 text-gray-800 dark:text-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-opacity-25 shadow-lg"
+                    title="Remove image"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Show upload area
+              <ImageUpload
+                type="course-cover"
+                currentImage={undefined}
+                onUploadSuccess={(urls) => setValue("coverImage", urls[0])}
+                onUploadError={(error) => console.error("Upload error:", error)}
+              />
+            )}
           </div>
 
           {/* Category */}
@@ -274,7 +297,7 @@ const CreateCoursePage = () => {
                         current.filter((_, i) => i !== idx)
                       );
                     }}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                    className="absolute top-1 right-1 bg-gray-100 bg-opacity-15 text-gray-800 dark:text-gray-200 rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-opacity-25"
                   >
                     ×
                   </button>
@@ -392,7 +415,7 @@ const CreateCoursePage = () => {
                           onClick={() =>
                             setValue(`chapters.${idx}.coverImage`, "")
                           }
-                          className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow-lg"
+                          className="absolute -top-1 -right-1 bg-gray-100 bg-opacity-15 text-gray-800 dark:text-gray-200 rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-opacity-25 shadow-lg"
                           title="Remove image"
                         >
                           ×
