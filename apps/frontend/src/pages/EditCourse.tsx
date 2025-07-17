@@ -25,7 +25,7 @@ const schema = z.object({
         _id: z.string().optional(),
       })
     )
-    .min(1),
+    .min(0),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -373,15 +373,13 @@ const EditCoursePage = () => {
                   <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                     Chapter {idx + 1}
                   </h3>
-                  {fields.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => remove(idx)}
-                      className="text-red-500 hover:text-red-700 font-medium px-3 py-1 rounded border border-red-500 hover:bg-red-50 dark:hover:bg-red-900"
-                    >
-                      Remove
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => remove(idx)}
+                    className="text-red-500 hover:text-red-700 font-medium px-3 py-1 rounded border border-red-500 hover:bg-red-50 dark:hover:bg-red-900"
+                  >
+                    Remove
+                  </button>
                 </div>
 
                 {/* Chapter Title */}
