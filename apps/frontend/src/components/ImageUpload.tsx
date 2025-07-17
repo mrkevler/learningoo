@@ -20,8 +20,6 @@ interface ImageUploadProps {
   maxFiles?: number;
   className?: string;
   children?: React.ReactNode;
-  aspectRatio?: number; // width/height ratio
-  showAspectRatioSelector?: boolean;
 }
 
 interface UploadProgress {
@@ -35,11 +33,6 @@ interface CropState {
   tempImageUrl: string | null;
 }
 
-interface AspectRatioState {
-  selectedRatio: number;
-  showSelector: boolean;
-}
-
 export const ImageUpload: React.FC<ImageUploadProps> = ({
   type,
   onUploadSuccess,
@@ -50,8 +43,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   maxFiles = 1,
   className = "",
   children,
-  aspectRatio,
-  showAspectRatioSelector = false,
 }) => {
   const [uploadProgress, setUploadProgress] = useState<UploadProgress>({
     uploading: false,
@@ -62,10 +53,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     showCropEditor: false,
     tempImageUrl: null,
   });
-  const [aspectRatioState, setAspectRatioState] = useState<AspectRatioState>({
-    selectedRatio: aspectRatio || 16 / 9,
-    showSelector: showAspectRatioSelector,
-  });
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = async (files: FileList) => {
@@ -360,61 +348,15 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         )}
       </div>
 
-      {/* Aspect Ratio Selector for lesson images */}
-      {type === "lesson-image" && aspectRatioState.showSelector && (
-        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-          <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-3">
-            Choose Image Aspect Ratio:
-          </h4>
-          <div className="flex gap-3">
-            {[
-              { ratio: 1, label: "1:1 Square" },
-              { ratio: 4 / 3, label: "4:3 Standard" },
-              { ratio: 16 / 9, label: "16:9 Widescreen" },
-            ].map(({ ratio, label }) => (
-              <button
-                key={ratio}
-                type="button"
-                onClick={() =>
-                  setAspectRatioState((prev) => ({
-                    ...prev,
-                    selectedRatio: ratio,
-                  }))
-                }
-                className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                  aspectRatioState.selectedRatio === ratio
-                    ? "bg-brand text-white"
-                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <div className="mt-3 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded">
-            <div
-              className="bg-gray-200 dark:bg-gray-700 rounded mx-auto"
-              style={{
-                width: "120px",
-                height: `${120 / aspectRatioState.selectedRatio}px`,
-              }}
-            />
-            <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-              Preview: {aspectRatioState.selectedRatio.toFixed(2)}:1 ratio
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Crop Editor Modal */}
       {cropState.showCropEditor && cropState.tempImageUrl && (
         <ImageCropEditor
           imageUrl={cropState.tempImageUrl}
           onSave={handleCropSave}
           onCancel={handleCropCancel}
-          aspectRatio={
-            type === "lesson-image" ? aspectRatioState.selectedRatio : 16 / 9
-          }
+          initialAspectRatio={16 / 9}
+          allowAspectRatioChange={type === "lesson-image"}
+          mode={type === "course-cover" ? "course-cover" : "lesson-image"}
         />
       )}
     </>
@@ -426,61 +368,15 @@ interface LessonImageUploadProps {
   currentImage?: string;
   onUploadSuccess: (url: string) => void;
   onUploadError?: (error: string) => void;
-  aspectRatio?: number;
 }
 
 export const LessonImageUpload: React.FC<LessonImageUploadProps> = ({
   currentImage,
   onUploadSuccess,
   onUploadError,
-  aspectRatio = 16 / 9,
 }) => {
-  const [selectedRatio, setSelectedRatio] = useState(aspectRatio);
-
   return (
     <div className="space-y-4">
-      {/* Aspect Ratio Selector */}
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-        <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200 mb-3">
-          Image Aspect Ratio:
-        </h4>
-        <div className="flex gap-2 mb-3">
-          {[
-            { ratio: 1, label: "1:1", desc: "Square" },
-            { ratio: 4 / 3, label: "4:3", desc: "Standard" },
-            { ratio: 16 / 9, label: "16:9", desc: "Widescreen" },
-          ].map(({ ratio, label, desc }) => (
-            <button
-              key={ratio}
-              type="button"
-              onClick={() => setSelectedRatio(ratio)}
-              className={`px-3 py-2 rounded text-xs font-medium transition-all ${
-                selectedRatio === ratio
-                  ? "bg-brand text-white shadow-md scale-105"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
-              }`}
-            >
-              <div>{label}</div>
-              <div className="text-xs opacity-75">{desc}</div>
-            </button>
-          ))}
-        </div>
-
-        {/* Aspect ratio preview */}
-        <div className="p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800">
-          <div
-            className="bg-gray-300 dark:bg-gray-600 rounded mx-auto shadow-inner"
-            style={{
-              width: "100px",
-              height: `${100 / selectedRatio}px`,
-            }}
-          />
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
-            Preview: {selectedRatio.toFixed(2)}:1 ratio
-          </p>
-        </div>
-      </div>
-
       {/* Image Upload Area */}
       {currentImage ? (
         // Show uploaded image with delete button (consistent with course pages)
@@ -502,11 +398,9 @@ export const LessonImageUpload: React.FC<LessonImageUploadProps> = ({
           </div>
         </div>
       ) : (
-        // Show upload area
+        // Show upload area with crop editor integration
         <ImageUpload
           type="lesson-image"
-          aspectRatio={selectedRatio}
-          showAspectRatioSelector={false}
           onUploadStart={(tempUrl) => onUploadSuccess(tempUrl)}
           onUploadSuccess={(urls) => onUploadSuccess(urls[0])}
           onUploadError={onUploadError}

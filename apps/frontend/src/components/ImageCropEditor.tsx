@@ -4,7 +4,9 @@ interface ImageCropEditorProps {
   imageUrl: string;
   onSave: (croppedImageBlob: Blob) => void;
   onCancel: () => void;
-  aspectRatio?: number; // width/height ratio - default 16:9
+  initialAspectRatio?: number; // width/height ratio - default 16:9
+  allowAspectRatioChange?: boolean; // Allow user to change aspect ratio
+  mode?: "course-cover" | "lesson-image"; // Determines available ratios and UI
 }
 
 interface ImageState {
@@ -13,11 +15,19 @@ interface ImageState {
   y: number;
 }
 
+interface AspectRatioOption {
+  ratio: number;
+  label: string;
+  description: string;
+}
+
 export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
   imageUrl,
   onSave,
   onCancel,
-  aspectRatio = 16 / 9,
+  initialAspectRatio = 16 / 9,
+  allowAspectRatioChange = false,
+  mode = "course-cover",
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,16 +39,56 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
     x: 0,
     y: 0,
   });
-
+  const [currentAspectRatio, setCurrentAspectRatio] =
+    useState(initialAspectRatio);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Canvas dimensions
+  // Define available aspect ratios based on mode
+  const getAspectRatioOptions = (): AspectRatioOption[] => {
+    if (mode === "course-cover") {
+      return [{ ratio: 16 / 9, label: "16:9", description: "Widescreen" }];
+    }
+    return [
+      { ratio: 1, label: "1:1", description: "Square" },
+      { ratio: 4 / 3, label: "4:3", description: "Standard" },
+      { ratio: 16 / 9, label: "16:9", description: "Widescreen" },
+    ];
+  };
+
+  const aspectRatioOptions = getAspectRatioOptions();
+
+  // Dynamic canvas dimensions based on current aspect ratio
   const CANVAS_WIDTH = 800;
-  const CANVAS_HEIGHT = CANVAS_WIDTH / aspectRatio;
+  const CANVAS_HEIGHT = CANVAS_WIDTH / currentAspectRatio;
   const PREVIEW_WIDTH = 400;
-  const PREVIEW_HEIGHT = PREVIEW_WIDTH / aspectRatio;
+  const PREVIEW_HEIGHT = PREVIEW_WIDTH / currentAspectRatio;
+
+  // Recalculate image position when aspect ratio changes
+  const recalculateImageState = useCallback(
+    (newAspectRatio: number) => {
+      if (!image) return;
+
+      const newCanvasHeight = CANVAS_WIDTH / newAspectRatio;
+      const scaleX = CANVAS_WIDTH / image.width;
+      const scaleY = newCanvasHeight / image.height;
+      const initialScale = Math.max(scaleX, scaleY);
+
+      setImageState({
+        scale: initialScale,
+        x: (CANVAS_WIDTH - image.width * initialScale) / 2,
+        y: (newCanvasHeight - image.height * initialScale) / 2,
+      });
+    },
+    [image, CANVAS_WIDTH]
+  );
+
+  // Handle aspect ratio change
+  const handleAspectRatioChange = (newRatio: number) => {
+    setCurrentAspectRatio(newRatio);
+    recalculateImageState(newRatio);
+  };
 
   // Load and initialize image
   useEffect(() => {
@@ -60,7 +110,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
       });
     };
     img.src = imageUrl;
-  }, [imageUrl, aspectRatio]);
+  }, [imageUrl, CANVAS_WIDTH, CANVAS_HEIGHT]);
 
   // Draw image on canvas
   const drawImage = useCallback(() => {
@@ -69,6 +119,10 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Update canvas dimensions
+    canvas.width = CANVAS_WIDTH;
+    canvas.height = CANVAS_HEIGHT;
 
     // Clear canvas
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -102,7 +156,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
 
     // Update preview
     updatePreview();
-  }, [imageState, imageLoaded, image]);
+  }, [imageState, imageLoaded, image, CANVAS_WIDTH, CANVAS_HEIGHT]);
 
   // Update preview canvas
   const updatePreview = useCallback(() => {
@@ -111,6 +165,10 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
     const previewCanvas = previewCanvasRef.current;
     const previewCtx = previewCanvas.getContext("2d");
     if (!previewCtx) return;
+
+    // Update preview canvas dimensions
+    previewCanvas.width = PREVIEW_WIDTH;
+    previewCanvas.height = PREVIEW_HEIGHT;
 
     previewCtx.clearRect(0, 0, PREVIEW_WIDTH, PREVIEW_HEIGHT);
 
@@ -137,9 +195,9 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
       PREVIEW_WIDTH,
       PREVIEW_HEIGHT
     );
-  }, [imageState, imageLoaded, image]);
+  }, [imageState, imageLoaded, image, PREVIEW_WIDTH, PREVIEW_HEIGHT]);
 
-  // Redraw when image state changes
+  // Redraw when image state or aspect ratio changes
   useEffect(() => {
     drawImage();
   }, [drawImage]);
@@ -178,17 +236,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
 
   // Reset to initial state
   const handleReset = () => {
-    if (!image) return;
-
-    const scaleX = CANVAS_WIDTH / image.width;
-    const scaleY = CANVAS_HEIGHT / image.height;
-    const initialScale = Math.max(scaleX, scaleY);
-
-    setImageState({
-      scale: initialScale,
-      x: (CANVAS_WIDTH - image.width * initialScale) / 2,
-      y: (CANVAS_HEIGHT - image.height * initialScale) / 2,
-    });
+    recalculateImageState(currentAspectRatio);
   };
 
   // Save cropped image
@@ -252,10 +300,10 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-6xl w-full max-h-[90vh] overflow-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-7xl w-full max-h-[95vh] overflow-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-            Edit Cover Photo
+            {mode === "course-cover" ? "Edit Cover Photo" : "Edit Lesson Image"}
           </h2>
           <button
             onClick={onCancel}
@@ -265,9 +313,48 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
           </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col xl:flex-row gap-6">
           {/* Main editing area */}
           <div className="flex-1">
+            {/* Aspect Ratio Selector */}
+            {allowAspectRatioChange && aspectRatioOptions.length > 1 && (
+              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-4 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
+                  Choose Aspect Ratio:
+                </h3>
+                <div className="flex gap-3 mb-4">
+                  {aspectRatioOptions.map(({ ratio, label, description }) => (
+                    <button
+                      key={ratio}
+                      onClick={() => handleAspectRatioChange(ratio)}
+                      className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                        currentAspectRatio === ratio
+                          ? "bg-brand text-white shadow-md transform scale-105"
+                          : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                      }`}
+                    >
+                      <div className="font-bold">{label}</div>
+                      <div className="text-xs opacity-75">{description}</div>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Live aspect ratio preview */}
+                <div className="p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded bg-gray-100 dark:bg-gray-800">
+                  <div
+                    className="bg-gray-300 dark:bg-gray-600 rounded mx-auto shadow-inner"
+                    style={{
+                      width: "120px",
+                      height: `${120 / currentAspectRatio}px`,
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
+                    Preview: {currentAspectRatio.toFixed(2)}:1 ratio
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4">
               <div
                 ref={containerRef}
@@ -291,27 +378,27 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
             <div className="flex flex-wrap gap-4 justify-center">
               <button
                 onClick={() => handleZoom("out")}
-                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
               >
                 Zoom Out
               </button>
               <button
                 onClick={() => handleZoom("in")}
-                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
               >
                 Zoom In
               </button>
               <button
                 onClick={handleReset}
-                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+                className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
               >
-                Reset
+                Reset Position
               </button>
             </div>
           </div>
 
           {/* Preview and actions */}
-          <div className="lg:w-80">
+          <div className="xl:w-96">
             <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4 mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">
                 Preview
@@ -325,7 +412,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
                 />
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                Aspect Ratio: {aspectRatio.toFixed(2)}:1
+                Final Aspect Ratio: {currentAspectRatio.toFixed(2)}:1
               </p>
             </div>
 
@@ -333,13 +420,13 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
             <div className="space-y-3">
               <button
                 onClick={handleSave}
-                className="w-full bg-brand text-white py-3 px-4 rounded-lg hover:bg-brand-dark font-semibold"
+                className="w-full bg-brand text-white py-3 px-4 rounded-lg hover:bg-brand-dark font-semibold transition-colors"
               >
                 Save Changes
               </button>
               <button
                 onClick={onCancel}
-                className="w-full bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600"
+                className="w-full bg-gray-500 text-white py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 Cancel
               </button>
@@ -351,7 +438,9 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
               <ul className="list-disc list-inside space-y-1">
                 <li>Drag the image to reposition</li>
                 <li>Use zoom buttons to scale</li>
+                <li>The dashed border shows crop area</li>
                 <li>Preview shows final result</li>
+                {allowAspectRatioChange && <li>Choose aspect ratio above</li>}
               </ul>
             </div>
           </div>
