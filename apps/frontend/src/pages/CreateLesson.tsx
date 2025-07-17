@@ -145,7 +145,7 @@ const CreateLessonPage = () => {
 
   // Advanced floating drag system
   const handleMouseDown = (e: React.MouseEvent, index: number) => {
-    // Don't start drag on form elements or buttons
+    // Don't start drag on form elements or buttons only
     const target = e.target as HTMLElement;
     if (
       target.tagName === "INPUT" ||

@@ -299,8 +299,16 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-7xl w-full max-h-[95vh] overflow-auto">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 crop-editor-modal"
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
+      <div
+        className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-7xl w-full max-h-[95vh] overflow-auto crop-editor-modal"
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
             {mode === "course-cover" ? "Edit Cover Photo" : "Edit Lesson Image"}

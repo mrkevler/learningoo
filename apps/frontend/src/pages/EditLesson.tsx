@@ -124,9 +124,14 @@ const EditLessonPage = () => {
   };
 
   const updateBlock = (id: string, newData: any) => {
-    setBlocks((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, data: newData } : b))
-    );
+    console.log("Updating block:", id, "with data:", newData);
+    setBlocks((prev) => {
+      const updated = prev.map((b) =>
+        b.id === id ? { ...b, data: newData } : b
+      );
+      console.log("Updated blocks:", updated);
+      return updated;
+    });
   };
 
   const moveBlock = (fromIndex: number, toIndex: number) => {
@@ -140,7 +145,7 @@ const EditLessonPage = () => {
 
   // Advanced floating drag system
   const handleMouseDown = (e: React.MouseEvent, index: number) => {
-    // Don't start drag on form elements or buttons
+    // Don't start drag on form elements or buttons only
     const target = e.target as HTMLElement;
     if (
       target.tagName === "INPUT" ||
@@ -378,6 +383,14 @@ const EditLessonPage = () => {
       alert("Please provide lesson title");
       return;
     }
+
+    // Debug: Log blocks before saving
+    console.log("Saving lesson with blocks:", blocks);
+    console.log(
+      "Image blocks:",
+      blocks.filter((b) => b.type === "image")
+    );
+
     mutation.mutate({
       title,
       contentBlocks: blocks,
