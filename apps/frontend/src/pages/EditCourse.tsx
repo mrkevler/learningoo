@@ -346,9 +346,9 @@ const EditCoursePage = () => {
             )}
           </div>
 
-          {/* Chapters Table */}
-          <section className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mt-8">
-            <div className="flex justify-between items-center mb-4">
+          {/* Chapters */}
+          <div>
+            <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-brand">Chapters</h2>
               <button
                 type="button"
@@ -358,151 +358,79 @@ const EditCoursePage = () => {
                     coverImage: "",
                   })
                 }
-                className="bg-brand text-white px-4 py-2 rounded hover:bg-brand-dark"
+                className="bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-700 dark:hover:bg-gray-600"
               >
                 + Add Chapter {fields.length + 1}
               </button>
             </div>
 
-            {fields.length > 0 && (
-              <div>
-                <table className="w-full border border-gray-300 dark:border-gray-600 rounded-lg">
-                  <thead className="bg-gray-100 dark:bg-gray-800">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-gray-800 dark:text-gray-100 font-semibold">
-                        #
-                      </th>
-                      <th className="px-4 py-3 text-left text-gray-800 dark:text-gray-100 font-semibold">
-                        Cover
-                      </th>
-                      <th className="px-4 py-3 text-left text-gray-800 dark:text-gray-100 font-semibold">
-                        Title
-                      </th>
-                      <th className="px-4 py-3 text-left text-gray-800 dark:text-gray-100 font-semibold">
-                        Cover Image URL
-                      </th>
-                      <th className="px-4 py-3 text-center text-gray-800 dark:text-gray-100 font-semibold">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {fields.map((field, idx) => (
-                      <tr
-                        key={field.id}
-                        className="border-t border-gray-200 dark:border-gray-700"
-                      >
-                        <td className="px-4 py-3 text-gray-800 dark:text-gray-100 font-medium">
-                          {idx + 1}
-                        </td>
-                        <td className="w-20 h-20 p-0 align-middle text-center">
-                          {watch(`chapters.${idx}.coverImage`) ? (
-                            <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
-                              <img
-                                src={watch(`chapters.${idx}.coverImage`)}
-                                alt="Chapter Cover"
-                                className="w-16 h-16 object-cover rounded border border-gray-300 dark:border-gray-700"
-                              />
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setValue(`chapters.${idx}.coverImage`, "")
-                                }
-                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600 shadow"
-                                title="Remove cover image"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ) : (
-                            <ImageUpload
-                              type="chapter-cover"
-                              currentImage={undefined}
-                              onUploadSuccess={(urls) =>
-                                setValue(`chapters.${idx}.coverImage`, urls[0])
-                              }
-                              onUploadError={(error) =>
-                                console.error(
-                                  "Chapter cover upload error:",
-                                  error
-                                )
-                              }
-                              className="w-16 h-16 mx-auto flex items-center justify-center"
-                            >
-                              <div className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded cursor-pointer transition hover:border-brand">
-                                <svg
-                                  className="h-7 w-7 text-gray-400"
-                                  stroke="currentColor"
-                                  fill="none"
-                                  viewBox="0 0 48 48"
-                                >
-                                  <path
-                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                    strokeWidth={2}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </div>
-                            </ImageUpload>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          <input
-                            type="text"
-                            placeholder="Chapter Title"
-                            {...register(`chapters.${idx}.title` as const)}
-                            className="w-full p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-brand"
-                          />
-                          {errors.chapters?.[idx]?.title && (
-                            <p className="text-red-500 text-xs mt-1">
-                              Required
-                            </p>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              {...register(
-                                `chapters.${idx}.coverImage` as const
-                              )}
-                              className={`flex-1 p-2 rounded bg-gray-100 dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-brand ${errors.chapters?.[idx]?.coverImage ? "border border-red-500" : ""}`}
-                            />
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setValue(`chapters.${idx}.coverImage`, "")
-                              }
-                              className="bg-gray-700 text-white px-2 py-1 rounded text-sm hover:bg-gray-600"
-                            >
-                              New
-                            </button>
-                          </div>
-                          {errors.chapters?.[idx]?.coverImage && (
-                            <p className="text-red-500 text-xs mt-1">
-                              Valid URL required
-                            </p>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          {fields.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => remove(idx)}
-                              className="text-red-500 hover:text-red-700 font-medium"
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {fields.map((field, idx) => (
+              <div
+                key={field.id}
+                className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6 border border-gray-200 dark:border-gray-700"
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                    Chapter {idx + 1}
+                  </h3>
+                  {fields.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => remove(idx)}
+                      className="text-red-500 hover:text-red-700 font-medium px-3 py-1 rounded border border-red-500 hover:bg-red-50 dark:hover:bg-red-900"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                {/* Chapter Title */}
+                <div className="mb-6">
+                  <label className="block mb-1 text-gray-800 dark:text-gray-100">
+                    Chapter Title
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Chapter Title"
+                    {...register(`chapters.${idx}.title` as const)}
+                    className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-2 focus:ring-brand"
+                  />
+                  {errors.chapters?.[idx]?.title && (
+                    <p className="text-red-500 text-sm mt-1">Required</p>
+                  )}
+                </div>
+
+                {/* Chapter Cover Image */}
+                <div>
+                  <label className="block mb-1 text-gray-800 dark:text-gray-100">
+                    Chapter Cover Image
+                  </label>
+                  <input
+                    type="text"
+                    {...register(`chapters.${idx}.coverImage` as const)}
+                    className={`w-full p-2 rounded bg-gray-100 dark:bg-gray-800 text-black dark:text-white focus:ring-2 focus:ring-brand ${errors.chapters?.[idx]?.coverImage ? "border border-red-500" : ""}`}
+                  />
+                  {errors.chapters?.[idx]?.coverImage && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Valid URL required
+                    </p>
+                  )}
+                  <ImageUpload
+                    type="chapter-cover"
+                    currentImage={
+                      watch(`chapters.${idx}.coverImage`) || undefined
+                    }
+                    onUploadSuccess={(urls) =>
+                      setValue(`chapters.${idx}.coverImage`, urls[0])
+                    }
+                    onUploadError={(error) =>
+                      console.error("Chapter cover upload error:", error)
+                    }
+                  />
+                </div>
               </div>
-            )}
-          </section>
+            ))}
+          </div>
 
           <button
             type="submit"
