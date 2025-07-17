@@ -14,6 +14,7 @@ interface ImageUploadProps {
     thumbnails?: Record<string, string>
   ) => void;
   onUploadError?: (error: string) => void;
+  onUploadStart?: (tempUrl: string) => void;
   currentImage?: string;
   multiple?: boolean;
   maxFiles?: number;
@@ -36,6 +37,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   type,
   onUploadSuccess,
   onUploadError,
+  onUploadStart,
   currentImage,
   multiple = false,
   maxFiles = 1,
@@ -179,13 +181,21 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   };
 
   const handleCropSave = async (croppedImageBlob: Blob) => {
-    // Close modal immediately
+    // Create temporary URL for the cropped blob to prevent validation errors
+    const tempCroppedUrl = URL.createObjectURL(croppedImageBlob);
+
+    // Close modal immediately and set temporary URL
     const tempUrlToCleanup = cropState.tempImageUrl;
     setCropState({ showCropEditor: false, tempImageUrl: null });
 
-    // Clean up temp URL
+    // Clean up original temp URL
     if (tempUrlToCleanup) {
       URL.revokeObjectURL(tempUrlToCleanup);
+    }
+
+    // Notify parent with temporary URL to prevent validation errors
+    if (onUploadStart) {
+      onUploadStart(tempCroppedUrl);
     }
 
     // Start upload process in background
@@ -225,6 +235,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         error.response?.data?.error || error.message || "Upload failed";
       setUploadProgress({ uploading: false, progress: 0, error: errorMessage });
       onUploadError?.(errorMessage);
+    } finally {
+      // Clean up temporary cropped URL
+      if (tempCroppedUrl) {
+        URL.revokeObjectURL(tempCroppedUrl);
+      }
     }
   };
 

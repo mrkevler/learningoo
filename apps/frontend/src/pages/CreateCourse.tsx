@@ -202,6 +202,9 @@ const CreateCoursePage = () => {
               <ImageUpload
                 type="course-cover"
                 currentImage={watch("coverImage")}
+                onUploadStart={(tempUrl) =>
+                  setValue("coverImage", tempUrl, { shouldValidate: true })
+                }
                 onUploadSuccess={(urls) =>
                   setValue("coverImage", urls[0], { shouldValidate: true })
                 }
