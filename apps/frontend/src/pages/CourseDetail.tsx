@@ -1,17 +1,19 @@
 // Debugging
 console.log("API Base URL:", import.meta.env.VITE_API_BASE);
-import React from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Layout from "../components/Layout";
 import { api } from "../services/api";
 import { useAppSelector, useAppDispatch } from "../store";
 import { setUser } from "../store/authSlice";
+import EnrollmentModal from "../components/EnrollmentModal";
 
 const CourseDetailPage = () => {
   const { slug } = useParams();
   const user = useAppSelector((s) => s.auth.user);
   const dispatch = useAppDispatch();
+  const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
 
   const { data: course, isLoading } = useQuery({
     queryKey: ["course", slug],
@@ -47,7 +49,8 @@ const CourseDetailPage = () => {
 
   const isOwner = user && user._id === (course.tutorId?._id || course.tutorId);
   const isEnrolled = enrollmentStatus && enrollmentStatus.length > 0;
-  const hasAccess = isOwner || isEnrolled;
+  const isAdmin = user?.role === "admin";
+  const hasAccess = isOwner || isEnrolled || isAdmin;
 
   return (
     <Layout>
@@ -139,7 +142,8 @@ const CourseDetailPage = () => {
                 return (
                   <div
                     key={ch._id}
-                    className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded overflow-hidden opacity-60 cursor-not-allowed"
+                    onClick={() => setShowEnrollmentModal(true)}
+                    className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded overflow-hidden cursor-pointer"
                   >
                     <img
                       src={ch.coverImage || `https://cataas.com/cat?${ch._id}`}
@@ -148,8 +152,8 @@ const CourseDetailPage = () => {
                     />
                     <div className="p-3 text-center text-gray-900 dark:text-white relative">
                       {ch.title}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-xs">
-                        🔒 Enrollment Required
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+                        <div className="text-2xl">🔒</div>
                       </div>
                     </div>
                   </div>
@@ -159,6 +163,20 @@ const CourseDetailPage = () => {
           </div>
         </section>
       </div>
+
+      {/* Enrollment Modal */}
+      {course && (
+        <EnrollmentModal
+          isOpen={showEnrollmentModal}
+          onClose={() => setShowEnrollmentModal(false)}
+          course={{
+            _id: course._id,
+            title: course.title,
+            price: course.price,
+            slug: course.slug,
+          }}
+        />
+      )}
     </Layout>
   );
 };

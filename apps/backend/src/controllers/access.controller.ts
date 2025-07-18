@@ -11,12 +11,13 @@ export const checkCourseAccessEndpoint = asyncHandler(
   async (req: Request, res: Response) => {
     const courseId = req.params.courseId;
     const userId = req.user?.id;
+    const userRole = req.user?.role;
 
     if (!userId) {
       return res.json({ hasAccess: false, isOwner: false });
     }
 
-    const result = await checkCourseAccess(userId, courseId);
+    const result = await checkCourseAccess(userId, courseId, userRole);
     res.json(result);
   }
 );
@@ -26,12 +27,13 @@ export const checkChapterAccessEndpoint = asyncHandler(
   async (req: Request, res: Response) => {
     const chapterId = req.params.chapterId;
     const userId = req.user?.id;
+    const userRole = req.user?.role;
 
     if (!userId) {
       return res.json({ hasAccess: false, isOwner: false });
     }
 
-    const result = await checkChapterAccess(userId, chapterId);
+    const result = await checkChapterAccess(userId, chapterId, userRole);
     res.json(result);
   }
 );
@@ -41,12 +43,13 @@ export const checkLessonAccessEndpoint = asyncHandler(
   async (req: Request, res: Response) => {
     const lessonId = req.params.lessonId;
     const userId = req.user?.id;
+    const userRole = req.user?.role;
 
     if (!userId) {
       return res.json({ hasAccess: false, isOwner: false });
     }
 
-    const result = await checkLessonAccess(userId, lessonId);
+    const result = await checkLessonAccess(userId, lessonId, userRole);
     res.json(result);
   }
 );

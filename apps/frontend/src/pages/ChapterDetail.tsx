@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import Layout from "../components/Layout";
 import { api, checkChapterAccess } from "../services/api";
 import { useAppSelector } from "../store";
+import EnrollmentModal from "../components/EnrollmentModal";
 
 const ChapterDetailPage = () => {
   const { id } = useParams();
   const user = useAppSelector((s) => s.auth.user);
+  const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
 
   const {
     data: chapter,
@@ -62,7 +64,8 @@ const ChapterDetailPage = () => {
     (user &&
       user._id ===
         (chapter.courseId?.tutorId?._id || chapter.courseId?.tutorId));
-  const hasAccess = accessData?.hasAccess || isOwner;
+  const isAdmin = user?.role === "admin";
+  const hasAccess = accessData?.hasAccess || isOwner || isAdmin;
 
   return (
     <Layout>
@@ -131,7 +134,8 @@ const ChapterDetailPage = () => {
                   return (
                     <div
                       key={ls._id}
-                      className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded flex items-center gap-3 opacity-60 cursor-not-allowed relative"
+                      onClick={() => setShowEnrollmentModal(true)}
+                      className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded flex items-center gap-3 cursor-pointer relative"
                     >
                       <span className="text-brand font-semibold">
                         {idx + 1}.
@@ -139,9 +143,7 @@ const ChapterDetailPage = () => {
                       <span className="text-gray-900 dark:text-white">
                         {ls.title}
                       </span>
-                      <span className="ml-auto text-sm text-gray-500">
-                        🔒 Enrollment Required
-                      </span>
+                      <span className="ml-auto text-xl">🔒</span>
                     </div>
                   );
                 }
@@ -164,6 +166,20 @@ const ChapterDetailPage = () => {
           </div>
         )}
       </div>
+
+      {/* Enrollment Modal */}
+      {chapter?.courseId && (
+        <EnrollmentModal
+          isOpen={showEnrollmentModal}
+          onClose={() => setShowEnrollmentModal(false)}
+          course={{
+            _id: chapter.courseId._id || chapter.courseId,
+            title: chapter.courseId.title || chapter.title,
+            price: chapter.courseId.price || 0,
+            slug: chapter.courseId.slug,
+          }}
+        />
+      )}
     </Layout>
   );
 };

@@ -65,6 +65,8 @@ const LessonDetailPage = () => {
     accessData?.isOwner ||
     (user &&
       user._id === (lesson.chapterId?.courseId?.tutorId || lesson.tutorId));
+  const isAdmin = user?.role === "admin";
+  const hasAccess = accessData?.hasAccess || isOwner || isAdmin;
 
   const renderBlock = (block: Block, idx: number) => {
     switch (block.type) {

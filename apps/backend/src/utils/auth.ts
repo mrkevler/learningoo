@@ -47,10 +47,16 @@ export const authenticateUser = (
 // Check if user has access to a course owner or enrolled
 export const checkCourseAccess = async (
   userId: string,
-  courseId: string
+  courseId: string,
+  userRole?: string
 ): Promise<{ hasAccess: boolean; isOwner: boolean }> => {
   if (!userId) {
     return { hasAccess: false, isOwner: false };
+  }
+
+  // Admin has access to everything
+  if (userRole === "admin") {
+    return { hasAccess: true, isOwner: true };
   }
 
   // Check if user is the course owner
@@ -76,7 +82,8 @@ export const checkCourseAccess = async (
 // Check if user has access to a chapter via course access
 export const checkChapterAccess = async (
   userId: string,
-  chapterId: string
+  chapterId: string,
+  userRole?: string
 ): Promise<{ hasAccess: boolean; isOwner: boolean; courseId?: string }> => {
   if (!userId) {
     return { hasAccess: false, isOwner: false };
@@ -87,14 +94,19 @@ export const checkChapterAccess = async (
     return { hasAccess: false, isOwner: false };
   }
 
-  const result = await checkCourseAccess(userId, chapter.courseId.toString());
+  const result = await checkCourseAccess(
+    userId,
+    chapter.courseId.toString(),
+    userRole
+  );
   return { ...result, courseId: chapter.courseId.toString() };
 };
 
 // Check if user has access to a lesson via chapter/course access
 export const checkLessonAccess = async (
   userId: string,
-  lessonId: string
+  lessonId: string,
+  userRole?: string
 ): Promise<{
   hasAccess: boolean;
   isOwner: boolean;
@@ -110,7 +122,11 @@ export const checkLessonAccess = async (
     return { hasAccess: false, isOwner: false };
   }
 
-  const result = await checkChapterAccess(userId, lesson.chapterId.toString());
+  const result = await checkChapterAccess(
+    userId,
+    lesson.chapterId.toString(),
+    userRole
+  );
   return { ...result, chapterId: lesson.chapterId.toString() };
 };
 
@@ -124,7 +140,11 @@ export const requireCourseAccess = (paramName: string = "id") => {
       return res.status(401).json({ message: "Authentication required" });
     }
 
-    const { hasAccess } = await checkCourseAccess(userId, courseId);
+    const { hasAccess } = await checkCourseAccess(
+      userId,
+      courseId,
+      req.user?.role
+    );
     if (!hasAccess) {
       return res
         .status(403)
@@ -145,7 +165,11 @@ export const requireChapterAccess = (paramName: string = "id") => {
       return res.status(401).json({ message: "Authentication required" });
     }
 
-    const { hasAccess } = await checkChapterAccess(userId, chapterId);
+    const { hasAccess } = await checkChapterAccess(
+      userId,
+      chapterId,
+      req.user?.role
+    );
     if (!hasAccess) {
       return res
         .status(403)
@@ -166,7 +190,11 @@ export const requireLessonAccess = (paramName: string = "id") => {
       return res.status(401).json({ message: "Authentication required" });
     }
 
-    const { hasAccess } = await checkLessonAccess(userId, lessonId);
+    const { hasAccess } = await checkLessonAccess(
+      userId,
+      lessonId,
+      req.user?.role
+    );
     if (!hasAccess) {
       return res
         .status(403)
