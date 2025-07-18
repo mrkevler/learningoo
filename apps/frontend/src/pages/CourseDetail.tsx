@@ -46,6 +46,8 @@ const CourseDetailPage = () => {
   if (isLoading || !course) return <Layout>Loading...</Layout>;
 
   const isOwner = user && user._id === (course.tutorId?._id || course.tutorId);
+  const isEnrolled = enrollmentStatus && enrollmentStatus.length > 0;
+  const hasAccess = isOwner || isEnrolled;
 
   return (
     <Layout>
@@ -115,22 +117,45 @@ const CourseDetailPage = () => {
             Chapters
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {course.chapters?.map((ch: any) => (
-              <Link
-                key={ch._id}
-                to={`/chapters/${ch._id}`}
-                className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded overflow-hidden hover-scale"
-              >
-                <img
-                  src={ch.coverImage || `https://cataas.com/cat?${ch._id}`}
-                  alt="chap"
-                  className="h-40 w-full object-cover"
-                />
-                <div className="p-3 text-center text-gray-900 dark:text-white">
-                  {ch.title}
-                </div>
-              </Link>
-            ))}
+            {course.chapters?.map((ch: any) => {
+              if (hasAccess) {
+                return (
+                  <Link
+                    key={ch._id}
+                    to={`/chapters/${ch._id}`}
+                    className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded overflow-hidden hover-scale"
+                  >
+                    <img
+                      src={ch.coverImage || `https://cataas.com/cat?${ch._id}`}
+                      alt="chap"
+                      className="h-40 w-full object-cover"
+                    />
+                    <div className="p-3 text-center text-gray-900 dark:text-white">
+                      {ch.title}
+                    </div>
+                  </Link>
+                );
+              } else {
+                return (
+                  <div
+                    key={ch._id}
+                    className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded overflow-hidden opacity-60 cursor-not-allowed"
+                  >
+                    <img
+                      src={ch.coverImage || `https://cataas.com/cat?${ch._id}`}
+                      alt="chap"
+                      className="h-40 w-full object-cover"
+                    />
+                    <div className="p-3 text-center text-gray-900 dark:text-white relative">
+                      {ch.title}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-xs">
+                        🔒 Enrollment Required
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+            })}
           </div>
         </section>
       </div>

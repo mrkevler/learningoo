@@ -28,6 +28,16 @@ export const updateUserAdmin = (
   id: string,
   data: { balance?: number; isActive?: boolean; licenseSlug?: string }
 ) => api.put(`/admin/users/${id}`, data);
+
+// Access control methods
+export const checkCourseAccess = (courseId: string) =>
+  api.get(`/access/course/${courseId}`);
+
+export const checkChapterAccess = (chapterId: string) =>
+  api.get(`/access/chapter/${chapterId}`);
+
+export const checkLessonAccess = (lessonId: string) =>
+  api.get(`/access/lesson/${lessonId}`);
 export const fetchAdminOverview = () => api.get("/admin/overview");
 export const updateCategory = (
   id: string,

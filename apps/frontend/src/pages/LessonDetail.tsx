@@ -1,7 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import Layout from "../components/Layout";
-import { api } from "../services/api";
+import { api, checkLessonAccess } from "../services/api";
 import { useAppSelector } from "../store";
 
 interface Block {
@@ -23,11 +23,48 @@ const LessonDetailPage = () => {
     queryFn: () => api.get(`/lessons/${id}`).then((r) => r.data),
   });
 
+  // Check access to this lesson
+  const { data: accessData } = useQuery({
+    queryKey: ["lessonAccess", id],
+    enabled: !!id && !!user,
+    queryFn: () => checkLessonAccess(id!).then((r) => r.data),
+  });
+
   if (isLoading) return <Layout>Loading...</Layout>;
-  if (error || !lesson) return <Layout>Lesson not found.</Layout>;
+
+  // Handle access denied
+  if (error && (error as any).response?.status === 403) {
+    return (
+      <Layout>
+        <div className="container mx-auto py-20 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="text-6xl mb-4">🔒</div>
+            <h1 className="text-2xl font-bold text-brand mb-4">
+              Access Denied
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              You need to enroll in this course to access this lesson.
+            </p>
+            {lesson?.chapterId?.courseId && (
+              <Link
+                to={`/courses/${lesson.chapterId.courseId.slug || lesson.chapterId.courseId._id}`}
+                className="bg-brand text-white px-6 py-3 rounded-lg hover:bg-brand-dark transition-colors"
+              >
+                View Course Details
+              </Link>
+            )}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!lesson) return <Layout>Lesson not found.</Layout>;
+
   const isOwner =
-    user &&
-    user._id === (lesson.chapterId?.courseId?.tutorId || lesson.tutorId);
+    accessData?.isOwner ||
+    (user &&
+      user._id === (lesson.chapterId?.courseId?.tutorId || lesson.tutorId));
 
   const renderBlock = (block: Block, idx: number) => {
     switch (block.type) {

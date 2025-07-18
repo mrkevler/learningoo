@@ -2,24 +2,67 @@ import React from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import Layout from "../components/Layout";
-import { api } from "../services/api";
+import { api, checkChapterAccess } from "../services/api";
 import { useAppSelector } from "../store";
 
 const ChapterDetailPage = () => {
   const { id } = useParams();
   const user = useAppSelector((s) => s.auth.user);
 
-  const { data: chapter, isLoading } = useQuery({
+  const {
+    data: chapter,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["chapter", id],
     enabled: !!id,
     queryFn: () => api.get(`/chapters/${id}`).then((r) => r.data),
   });
 
-  if (isLoading || !chapter) return <Layout>Loading...</Layout>;
+  // Check access to this chapter
+  const { data: accessData } = useQuery({
+    queryKey: ["chapterAccess", id],
+    enabled: !!id && !!user,
+    queryFn: () => checkChapterAccess(id!).then((r) => r.data),
+  });
+
+  if (isLoading) return <Layout>Loading...</Layout>;
+
+  // Handle access denied
+  if (error && (error as any).response?.status === 403) {
+    return (
+      <Layout>
+        <div className="container mx-auto py-20 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="text-6xl mb-4">🔒</div>
+            <h1 className="text-2xl font-bold text-brand mb-4">
+              Access Denied
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              You need to enroll in this course to access this chapter.
+            </p>
+            {chapter?.courseId && (
+              <Link
+                to={`/courses/${chapter.courseId.slug || chapter.courseId._id}`}
+                className="bg-brand text-white px-6 py-3 rounded-lg hover:bg-brand-dark transition-colors"
+              >
+                View Course Details
+              </Link>
+            )}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!chapter) return <Layout>Chapter not found.</Layout>;
 
   const isOwner =
-    user &&
-    user._id === (chapter.courseId?.tutorId?._id || chapter.courseId?.tutorId);
+    accessData?.isOwner ||
+    (user &&
+      user._id ===
+        (chapter.courseId?.tutorId?._id || chapter.courseId?.tutorId));
+  const hasAccess = accessData?.hasAccess || isOwner;
 
   return (
     <Layout>
@@ -68,18 +111,41 @@ const ChapterDetailPage = () => {
           </h2>
           {chapter.lessons && chapter.lessons.length > 0 ? (
             <div className="space-y-6">
-              {chapter.lessons.map((ls: any, idx: number) => (
-                <Link
-                  key={ls._id}
-                  to={`/lessons/${ls._id}`}
-                  className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded flex items-center gap-3 hover-scale"
-                >
-                  <span className="text-brand font-semibold">{idx + 1}.</span>
-                  <span className="text-gray-900 dark:text-white">
-                    {ls.title}
-                  </span>
-                </Link>
-              ))}
+              {chapter.lessons.map((ls: any, idx: number) => {
+                if (hasAccess) {
+                  return (
+                    <Link
+                      key={ls._id}
+                      to={`/lessons/${ls._id}`}
+                      className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded flex items-center gap-3 hover-scale"
+                    >
+                      <span className="text-brand font-semibold">
+                        {idx + 1}.
+                      </span>
+                      <span className="text-gray-900 dark:text-white">
+                        {ls.title}
+                      </span>
+                    </Link>
+                  );
+                } else {
+                  return (
+                    <div
+                      key={ls._id}
+                      className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded flex items-center gap-3 opacity-60 cursor-not-allowed relative"
+                    >
+                      <span className="text-brand font-semibold">
+                        {idx + 1}.
+                      </span>
+                      <span className="text-gray-900 dark:text-white">
+                        {ls.title}
+                      </span>
+                      <span className="ml-auto text-sm text-gray-500">
+                        🔒 Enrollment Required
+                      </span>
+                    </div>
+                  );
+                }
+              })}
             </div>
           ) : (
             <p className="text-gray-500 dark:text-gray-400">No lessons yet.</p>
