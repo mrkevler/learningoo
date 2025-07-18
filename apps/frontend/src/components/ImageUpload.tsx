@@ -164,15 +164,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   };
 
   const handleClick = () => {
-    console.log("ImageUpload handleClick called");
-    console.log("uploadProgress.uploading:", uploadProgress.uploading);
-    console.log("fileInputRef.current:", fileInputRef.current);
-
     if (!uploadProgress.uploading) {
-      console.log("Attempting to click file input");
       fileInputRef.current?.click();
-    } else {
-      console.log("Upload in progress, click blocked");
     }
   };
 

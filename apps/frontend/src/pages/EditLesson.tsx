@@ -592,27 +592,13 @@ const EditLessonPage = () => {
                             onClick={(e) => {
                               // Only stop propagation if not clicking on upload elements
                               const target = e.target as HTMLElement;
-                              console.log("Block click - target:", target);
-                              console.log("Target tagName:", target.tagName);
-                              console.log(
-                                "Closest upload-clickable:",
-                                target.closest("[data-upload-clickable]")
-                              );
-                              console.log(
-                                "Closest svg:",
-                                target.closest("svg")
-                              );
-
                               if (
                                 !target.closest("[data-upload-clickable]") &&
                                 !target.closest("svg") &&
                                 target.tagName !== "svg" &&
                                 target.tagName !== "path"
                               ) {
-                                console.log("Stopping propagation");
                                 e.stopPropagation();
-                              } else {
-                                console.log("Allowing click to pass through");
                               }
                             }}
                           >
