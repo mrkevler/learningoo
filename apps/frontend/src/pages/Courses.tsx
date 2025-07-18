@@ -1,10 +1,16 @@
 import Layout from "../components/Layout";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../services/api";
 import { useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import { useAppSelector, useAppDispatch } from "../store";
+import { setUser } from "../store/authSlice";
 
 const CoursesPage = () => {
+  const user = useAppSelector((s) => s.auth.user);
+  const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
+
   const { data: courses } = useQuery({
     queryKey: ["coursesSummary"],
     queryFn: () => api.get("/courses/summary").then((r) => r.data),
@@ -12,6 +18,16 @@ const CoursesPage = () => {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: () => api.get("/categories").then((r) => r.data),
+  });
+
+  // Fetch user enrollments to check if already enrolled
+  const { data: enrollments } = useQuery({
+    enabled: !!user,
+    queryKey: ["myEnrollments"],
+    queryFn: () =>
+      api
+        .get("/enrollments", { params: { studentId: user?._id } })
+        .then((r) => r.data),
   });
 
   const grouped: Record<string, any[]> = {};
@@ -25,6 +41,64 @@ const CoursesPage = () => {
 
   const [selected, setSelected] = useState<string>("All");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Enrollment mutation
+  const enrollMutation = useMutation({
+    mutationFn: ({
+      courseId,
+      studentId,
+    }: {
+      courseId: string;
+      studentId: string;
+    }) =>
+      api
+        .post(`/courses/${courseId}/enroll`, { studentId })
+        .then((r) => r.data),
+    onSuccess: (data) => {
+      const newUser = { ...(user as any), balance: data.balance };
+      dispatch(setUser(newUser));
+      queryClient.invalidateQueries({ queryKey: ["coursesSummary"] });
+      queryClient.invalidateQueries({ queryKey: ["myEnrollments"] });
+      alert(
+        "Enrolled successfully! You now have access to all course content."
+      );
+    },
+    onError: (error: any) => {
+      alert(error.response?.data?.message || "Enrollment failed");
+    },
+  });
+
+  const handleEnrollment = (course: any) => {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    if (
+      window.confirm(
+        `Do you want to enroll in "${course.title}" for €${course.price}?`
+      )
+    ) {
+      enrollMutation.mutate({ courseId: course._id, studentId: user._id });
+    }
+  };
+
+  // Helper function to check if user is enrolled in a course
+  const isEnrolledInCourse = (courseId: string) => {
+    if (!enrollments || !user) return false;
+    return enrollments.some((enrollment: any) => {
+      const enrollmentCourseId =
+        typeof enrollment.courseId === "object"
+          ? enrollment.courseId._id || enrollment.courseId.toString()
+          : enrollment.courseId.toString();
+      return enrollmentCourseId === courseId;
+    });
+  };
+
+  // Helper function to check if user owns the course
+  const ownsCourse = (course: any) => {
+    return user && user._id === course.tutorId;
+  };
 
   return (
     <Layout>
@@ -179,9 +253,47 @@ const CoursesPage = () => {
                         {/* Action Buttons */}
                         <div className="mt-4 md:mt-6 space-y-2">
                           {/* Buy Button */}
-                          <button className="w-full btn-primary text-center">
-                            Buy Now - €{c.price || 0}
-                          </button>
+                          {(() => {
+                            const isOwner = ownsCourse(c);
+                            const isEnrolled = isEnrolledInCourse(c._id);
+                            const isAdmin = user?.role === "admin";
+
+                            if (isOwner) {
+                              return (
+                                <a
+                                  href={`/my-courses/${c._id}/edit`}
+                                  className="w-full btn-primary text-center block"
+                                >
+                                  Edit Course
+                                </a>
+                              );
+                            }
+
+                            if (isEnrolled || isAdmin) {
+                              return (
+                                <a
+                                  href={`/courses/${c.slug}`}
+                                  className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded transition-colors text-center block"
+                                >
+                                  {isAdmin
+                                    ? "View Course (Admin)"
+                                    : "Access Course"}
+                                </a>
+                              );
+                            }
+
+                            return (
+                              <button
+                                onClick={() => handleEnrollment(c)}
+                                disabled={enrollMutation.isPending}
+                                className="w-full btn-primary text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {enrollMutation.isPending
+                                  ? "Enrolling..."
+                                  : `Buy Now - €${c.price || 0}`}
+                              </button>
+                            );
+                          })()}
 
                           {/* View Course Link */}
                           <a
