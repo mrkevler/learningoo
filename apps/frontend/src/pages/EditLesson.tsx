@@ -140,7 +140,7 @@ const EditLessonPage = () => {
 
   // Advanced floating drag system
   const handleMouseDown = (e: React.MouseEvent, index: number) => {
-    // Don't start drag on form elements or buttons only
+    // Don't start drag on form elements, buttons, or upload areas
     const target = e.target as HTMLElement;
     if (
       target.tagName === "INPUT" ||
@@ -148,7 +148,11 @@ const EditLessonPage = () => {
       target.tagName === "BUTTON" ||
       target.closest("button") ||
       target.closest("input") ||
-      target.closest("textarea")
+      target.closest("textarea") ||
+      target.closest("[data-upload-clickable]") ||
+      target.closest("svg") ||
+      target.tagName === "svg" ||
+      target.tagName === "path"
     ) {
       return;
     }
@@ -588,13 +592,27 @@ const EditLessonPage = () => {
                             onClick={(e) => {
                               // Only stop propagation if not clicking on upload elements
                               const target = e.target as HTMLElement;
+                              console.log("Block click - target:", target);
+                              console.log("Target tagName:", target.tagName);
+                              console.log(
+                                "Closest upload-clickable:",
+                                target.closest("[data-upload-clickable]")
+                              );
+                              console.log(
+                                "Closest svg:",
+                                target.closest("svg")
+                              );
+
                               if (
                                 !target.closest("[data-upload-clickable]") &&
                                 !target.closest("svg") &&
                                 target.tagName !== "svg" &&
                                 target.tagName !== "path"
                               ) {
+                                console.log("Stopping propagation");
                                 e.stopPropagation();
+                              } else {
+                                console.log("Allowing click to pass through");
                               }
                             }}
                           >

@@ -145,7 +145,7 @@ const CreateLessonPage = () => {
 
   // Advanced floating drag system
   const handleMouseDown = (e: React.MouseEvent, index: number) => {
-    // Don't start drag on form elements or buttons only
+    // Don't start drag on form elements, buttons, or upload areas
     const target = e.target as HTMLElement;
     if (
       target.tagName === "INPUT" ||
@@ -153,7 +153,11 @@ const CreateLessonPage = () => {
       target.tagName === "BUTTON" ||
       target.closest("button") ||
       target.closest("input") ||
-      target.closest("textarea")
+      target.closest("textarea") ||
+      target.closest("[data-upload-clickable]") ||
+      target.closest("svg") ||
+      target.tagName === "svg" ||
+      target.tagName === "path"
     ) {
       return;
     }
