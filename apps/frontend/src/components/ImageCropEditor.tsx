@@ -272,7 +272,7 @@ export const ImageCropEditor: React.FC<ImageCropEditorProps> = ({
     const minScaleY = CANVAS_HEIGHT / image.height;
     const minScale = Math.max(minScaleX, minScaleY);
 
-    // Apply constraints: minimum scale to cover canvas maximum scale of 5x
+    // Apply constraints: minimum scale to cover canvas maximum scale of 5 times
     const constrainedScale = Math.max(minScale, Math.min(5, newScale));
 
     // Calculate new image dimensions

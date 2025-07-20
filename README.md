@@ -4,7 +4,7 @@
 
 **Repository:** [mrkevler/learningoo](https://github.com/mrkevler/learningoo)
 
-**Demo** 🌐 [](#)
+**Dev Demo** 🌐 [learningoo-dev.netlify.app](https://learningoo-dev.netlify.app)
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white) ![Express](https://img.shields.io/badge/Express.js-5-000000?logo=express&logoColor=white) ![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white) ![Redux](https://img.shields.io/badge/Redux_Toolkit-2-764ABC?logo=redux&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)  
 ![GitHub](https://img.shields.io/github/followers/mrkevler?label=Follow&style=social) ![License](https://img.shields.io/badge/License-MIT-blue)  
@@ -34,7 +34,7 @@
     - [Installation](#installation)
     - [Environment Variables](#environment-variables)
     - [Docker Setup](#docker-setup)
-        - [💡 Note that you don't need **MongoDB** setup while working with Docker](#-note-that-you-dont-need-mongodb-setup-while-working-with-docker)
+      - [💡 Note that you don't need **MongoDB** setup while working with Docker](#-note-that-you-dont-need-mongodb-setup-while-working-with-docker)
   - [🔧 Development](#-development)
     - [Running Locally](#running-locally)
     - [API Endpoints](#api-endpoints)
